@@ -22,7 +22,7 @@ def connect_db():
 
 def init_db():
 	with closing(connect_db()) as db:
-		with app.open_resource('pn_db_schema.sql', mode='r') as f:
+		with app.open_resource('pn_db_default_schema.sql', mode='r') as f:
 			db.cursor().executescript(f.read())
 		db.commit()
 
@@ -38,7 +38,7 @@ def teardown_request_fromdb(exception):
 
 @app.route('/')
 def show_entries():
-	cursor = g.db.execute('select * from resistors order by pn desc')
+	cursor = g.db.execute('select * from resistor order by pn desc')
 	rowfromdb = [dict(pn=rowfromdb[0], value=rowfromdb[1], param=rowfromdb[2], desc=rowfromdb[3],
 		status=rowfromdb[4], rohs=rowfromdb[5], datasheet=rowfromdb[6])
 			 for rowfromdb in cursor.fetchall()]

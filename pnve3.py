@@ -39,13 +39,12 @@ def teardown_request_fromdb(exception):
 @app.route('/')
 def show_entries():
 	cursor = g.db.execute('select * from resistor order by pn desc')
-	rowfromdb = [dict(pn=rowfromdb[0], value=rowfromdb[1], param=rowfromdb[2], desc=rowfromdb[3],
-		status=rowfromdb[4], rohs=rowfromdb[5], datasheet=rowfromdb[6])
-			 for rowfromdb in cursor.fetchall()]
-#	while rowfromdb is not None:
-#		print pn, value, param,
-#		rowfromdb=cursor.fetchone()
-	return render_template('show_db_entries.html', rowfromdb=rowfromdb)
+	cursor_cols_db = g.db.execute('pragma table_info(resistor)')
+	db_rows = cursor.fetchall()
+	print db_rows[0]
+	cols_db = cursor_cols_db.fetchall()
+	print cols_db[0]
+	return render_template('show_db_entries.html', db_rows=db_rows, cols_db=cols_db)
 
 if __name__ == '__main__':
     app.run()

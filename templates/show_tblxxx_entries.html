@@ -1,0 +1,43 @@
+<!doctype html>
+<head>
+	{% block head %}
+	<title>{% block title %}PnVE3{% endblock %} </title>
+	<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
+	{% endblock %}
+</head>
+<body>
+{% block body %}
+<div class=page>
+  <h1 align="center">Partnumber Database Viewer-Editor v3</h1>
+ 	<form action="{{ url_for('add_tbl1xx_entry') }}" method=post class=add-entry>
+		<dl>
+		{% set cols_num = cols | length %}
+		{% for col in cols %}
+			<dt>{{col}}:
+			<dd><input type=text size=10 name={{col}}>
+		{% endfor %}
+			<dd><input type=submit value=Share>
+		</dl>
+	</form>
+<div style="overflow-x:auto">
+	<table width=100%>
+		<tr>
+		{% for col in cols %}
+			<th>{{col}}</th>
+		{% endfor %}
+		</tr>
+		<tr>
+		{% set cols_num = cols | length %}
+		{% for row in rows %}
+			{% for i in range(cols_num) %}
+			<td>{{ row[i] }}</td>
+			{% endfor %}
+		</tr>
+		{% else %}
+		<em>No entries here so far</em>
+		{% endfor %}
+	</table>
+</div>
+</div>
+{% endblock %}
+</body>

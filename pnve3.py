@@ -1,6 +1,7 @@
 # all the imports
 import sqlite3
 import os
+from flask_bootstrap import Bootstrap
 from flask import Flask, request, session, g, redirect, url_for, \
      abort, render_template, flash
 from contextlib import closing
@@ -15,6 +16,7 @@ USERNAME = 'admin'
 PASSWORD = 'jelszo'
 
 app = Flask(__name__)
+Bootstrap(app)
 app.config.from_object(__name__)
 
 def connect_db():
@@ -38,23 +40,40 @@ def teardown_request_fromdb(exception):
 
 @app.route('/')
 def show_tbl1xx_entries():
-	template_data = {}
-
-#	cursor_partnumber = g.db.execute('select grp || '-' || substr('00000'||pn,-5,5) || '-' || ver from tbl1xx as partnumber')
-	cursor = g.db.execute('select * from tbl1xx')
-#	template_data["pn"] = cursor_partnumber_fetchall()
-	template_data["rows"] = cursor.fetchall()
-	template_data["cols"] = list(map(lambda x: x[0], cursor.description))
-	return render_template('show_tblxxx_entries.html', **template_data)
+    template_data = {}
+    #cursor_partnumber = g.db.execute('select grp || '-' || substr('00000'||pn,-5,5) || '-' || ver from tbl1xx as partnumber')
+    cursor = g.db.execute('select * from tbl1xx')
+    #template_data["pn"] = cursor_partnumber_fetchall()
+    query_for_tbl_select = "select name from sqlite_master where name like 'tbl%'"
+    tbl_select = g.db.execute(query_for_tbl_select)
+    template_data["rows"] = cursor.fetchall()
+    template_data["tbls"] = map(lambda x: x[0], tbl_select.fetchall())
+    template_data["cols"] = list(map(lambda x: x[0], cursor.description))
+    return render_template('show_tblxxx_entries.html', **template_data)
 
 @app.route('/addtbl1xx', methods=['POST'])
 def add_tbl1xx_entry():
 #    if not session.get('logged_in'):
 #        abort(401)
-	g.db.execute('insert into tbl1xx (grp, ver, value, param, desc, status, rohs, datasheet) values (?, ?, ?, ?, ?, ?, ?, ?)',
-				[request.form['grp'], request.form['ver'], request.form['value'], request.form['param'], request.form['desc'], 					request.form['status'], request.form['rohs'], request.form['datasheet']])
+	g.db.execute('insert into tbl1xx (grp, ver, value, param, desc, status, rohs, datasheet) \
+        values (?, ?, ?, ?, ?, ?, ?, ?)',
+        [request.form['grp'], request.form['ver'], request.form['value'], request.form['param'], request.form['desc'],
+        request.form['status'], request.form['rohs'], request.form['datasheet']])
 	g.db.commit()
 	flash('New entry was successfully posted')
+	return redirect(url_for('show_tbl1xx_entries'))
+
+@app.route('/deltbl1xx', methods=['POST'])
+def del_tbl1xx_entry():
+#    if not session.get('logged_in'):
+#        abort(401)
+	cursor = g.db.execute('select * from tbl1xx')
+	get_tbl1xx_values = cursor.fetchall()
+	get_tbl1xx_tbl_header = list(map(lambda x: x[0], cursor.description))
+#	query = "delete from tbl1xx where ?=,?',(request.form['get_tbl1xx_tbl_header'],
+#	g.db.execute(query)
+#	g.db.commit()
+	flash('Entry was successfully deleted')
 	return redirect(url_for('show_tbl1xx_entries'))
 
 if __name__ == '__main__':

@@ -1,30 +1,57 @@
 <!doctype html>
+<html>
 <head>
-	{% block head %}
-	<title>{% block title %}PnVE3{% endblock %} </title>
-	<link rel=stylesheet type=text/css href="{{ url_for('static', filename='style.css') }}">
-	{% endblock %}
+	</head>
+	<title>PnVE3</title>
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="database editor for OrCAD">
+  <meta name="author" content="qodbop">
+	<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/bootstrap.css') }}">
+	<style>
+		tr:nth-child(even)	{ background-color: #e6e6e6;}
+		th, td							{ padding: 10px; text-align: center;}
+
+		.page								{ margin: 2% auto; width: 90%; border: 5px solid #ccc;
+													padding: 0.8em; background: white; }
+	</style>
 </head>
 <body>
 {% block body %}
 <div class=page>
   <h1 align="center">Partnumber Database Viewer-Editor v3</h1>
- 	<form action="{{ url_for('add_tbl1xx_entry') }}" method=post class=add-entry>
-		<dl>
-		{% set cols_num = cols | length %}
+<!--Add entry-->
+ 	<form action="{{ url_for('add_tbl1xx_entry') }}" method=post>
+		<h3>Add row</h3>
 		{% for col in cols %}
-			<dt>{{col}}:
-			<dd><input type=text size=10 name={{col}}>
+			{{col}}:
+			<input type=text size=10 name={{col}}>
 		{% endfor %}
-			<dd><input type=submit value=Share>
-		</dl>
+			<input type="submit" value="Add">
 	</form>
+<br>
+<div class="dropdown">
+  <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="false" aria-expanded="false">
+    Select table
+    <span class="caret"></span>
+  </button>
+  <ul class="dropdown-menu" aria-labelledby="tableSelect">
+		{% for tbl in tbls %}
+		<li><a href="#{# {{ url_for('show_{{tbl}}_entries') }} #}">{{tbl}}</a></li>
+		{% endfor %}
+  </ul>
+</div>
+<br>
+<!--Table view-->
 <div style="overflow-x:auto">
-	<table width=100%>
+	<table width=100%  border="1px solid black" border-collapse="collapse">
 		<tr>
 		{% for col in cols %}
 			<th>{{col}}</th>
 		{% endfor %}
+			<th width="50px">Mod</th>
+			<th width="50px">Del</th>
+			<th width="120px">Select
+			<input type="checkbox" class="check" id="checkAll"></th>
 		</tr>
 		<tr>
 		{% set cols_num = cols | length %}
@@ -32,6 +59,15 @@
 			{% for i in range(cols_num) %}
 			<td>{{ row[i] }}</td>
 			{% endfor %}
+		{% set rows_num = rows | length %}
+<!--			<td><input type="button" name="mod" value="go_to_mod_page"></td> -->
+			<td><button type="button" class="btn btn-default" aria-label="mod">
+					<span class="glyphicon glyphicon-pencil" aria-hidden="true"></span>
+					</button>
+			<td><button type="button" class="btn btn-default" aria-label="delete">
+					<span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+					</button>
+			<td><input class="check" type="checkbox" value="1"></td>
 		</tr>
 		{% else %}
 		<em>No entries here so far</em>
@@ -39,5 +75,14 @@
 	</table>
 </div>
 </div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+<script src="{{ url_for('static', filename='js/bootstrap.js') }}" type="text/javascript"></script>
+<!--Script for checking all checkboxs-->
+<script>
+$("#checkAll").click(function() {
+  $(".check").prop('checked', $(this).prop('checked'));
+});
+</script>
 {% endblock %}
 </body>
+</html>

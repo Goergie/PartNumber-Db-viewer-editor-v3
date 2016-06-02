@@ -1,0 +1,11 @@
+{% extends "show_tbl1xx_entries.html" %}
+{% block body%}
+<form action="{{ url_for('mod_tbl1xx') }}" method=post>
+  <h3>Edit row</h3>
+ {% for col in cols %}
+   {{col}}:
+   <input type=text size=10 name={{col}}>
+ {% endfor %}
+   <input type="submit" value="Add">
+</form>
+{% end block %}

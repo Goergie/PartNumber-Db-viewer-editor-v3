@@ -18,7 +18,7 @@ create table tbl1xx (
   param text check( length(param) <=5) not null,
   desc text check( length(desc) <=10) default 'n/a',
   status text check( status in ('active','inactive','deleted','n/a')) not null default 'n/a',
-  rohs text check(rohs in ('yes', 'YES', 'no', 'NO', 'n/a')) not null default 'n/a',
+  rohs text check(rohs in ('yes', 'no', 'n/a')) not null default 'n/a',
   datasheet text check( length(datasheet) <=30) default 'n/a'
 );
 

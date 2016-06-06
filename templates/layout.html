@@ -1,0 +1,21 @@
+<!doctype html>
+<html>
+<head>
+	{% block title %}
+	<title>PnVE3</title>
+	{% endblock%}
+		<meta name="viewport" content="width=device-width, initial-scale=1">
+		<meta name="description" content="database editor for OrCAD">
+		<meta name="author" content="qodbop">
+
+		<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/bootstrap.css') }}">
+		<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/own_mod_style.css') }}">
+
+</head>
+<body>
+<div class=page>
+{% block body %}
+{% endblock %}
+</div>
+</body>
+</html>

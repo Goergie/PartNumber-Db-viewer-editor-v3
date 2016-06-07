@@ -13,9 +13,21 @@
 
 </head>
 <body>
+{% for message in get_flashed_messages() %}
+	<div class = flash> {{ message }}
+		<button onclick="closeWin()" type="button" class="btn btn-default">
+	  	<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
+		</button></div>
+{% endfor %}
 <div class=page>
 {% block body %}
 {% endblock %}
 </div>
+<script>
+var myWindow = <div class = flash>
+function closeWin() {
+    myWindow.close();
+}
+</script>
 </body>
 </html>

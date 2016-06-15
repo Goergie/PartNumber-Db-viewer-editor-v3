@@ -1,42 +1,45 @@
 {% extends "layout.html"%}
 {% block body %}
+<h3>Modify row</h3>
 <form action="{{ url_for('mod_tbl1xx_entry') }}" method=post class="form-inline" role="add_row_form">
-  <h3>Modify row</h3>
+  <input type="hidden" id={{pn}} name="modify" value="{{pn}}">
+{% set cols_num = cols | length %}
 {% for col in cols %}
   {% if col != 'status' and col != 'rohs' and col !='pn' %}
-  <div class="form-group">
-    <label for="{{col}}">&nbsp; {{col}}: &nbsp;</label><input type=text size=10 name={{col}} id="{{col}}">
-  </div>
+    <div class="form-group">
+      <label for="{{col}}">&nbsp; {{col}}: &nbsp;</label><input type=text size=10 name={{col}} id="{{col}}">
+    </div>
   {% endif %}
   {% if col == 'status'%}
-  <div class="form-group dropdown">
-    <label for="{{col}}">&nbsp; {{col}}:&nbsp; </label>
-    <select class="form-control text-center" id="{{col}}" name="{{col}}">
-      <option value="active">Active</option>
-      <option value="inactive">Inactive</option>
-      <option value="deleted">Deleted</option>
-      <option value="n/a">n/a</option>
-    </select>
-  </div>
+    <div class="form-group dropdown">
+      <label for="{{col}}">&nbsp; {{col}}:&nbsp; </label>
+      <select class="form-control text-center" id="{{col}}" name="{{col}}">
+        <option value="active">Active</option>
+        <option value="inactive">Inactive</option>
+        <option value="deleted">Deleted</option>
+        <option value="n/a">n/a</option>
+      </select>
+    </div>
   {% endif %}
   {% if col == 'rohs'%}
-  <div class="form-group dropdown">
-    <label for={{col}}>&nbsp; {{col}}: &nbsp;</label>
-    <select class="form-control text-center" id="{{col}}" name="{{col}}">
-      <option value="yes">Yes</option>
-      <option value="no">No</option>
-      <option value=">n/a">n/a</option>
-    </select>
-  </div>
+    <div class="form-group dropdown">
+      <label for={{col}}>&nbsp; {{col}}: &nbsp;</label>
+      <select class="form-control text-center" id="{{col}}" name="{{col}}">
+        <option value="yes">Yes</option>
+        <option value="no">No</option>
+        <option value="n/a">n/a</option>
+      </select>
+    </div>
   {% endif %}
 {% endfor %}
   <br>
   <br>
-  <div class="form-group">
-    <input type="submit" class="btn btn-success" name="pn" value=Modify>
-  </div>
+    <div class="form-group">
+      <input type="submit" class="btn btn-success" name="pn" value="Modify">
+    </div>
+  </input>
+
 </form>
 <br>
-<p>Will be able to mod entries on this page</p>
 <a href="{{ url_for('show_tbl1xx_entries') }}">back</a>
 {% endblock %}

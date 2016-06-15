@@ -11,12 +11,12 @@ drop table if exists tbl6xx;
 -- *************************
 
 create table tbl1xx (
-  grp integer check( length(grp) <=3) not null,
+  grp integer check( length(grp) = 3) not null,
   pn integer primary key autoincrement,
-  ver integer check(length(ver) <=2) not null default '01',
-  value text check( length(value) <=4) not null,
-  param text check( length(param) <=5) not null,
-  desc text check( length(desc) <=10) default 'n/a',
+  ver integer check(length(ver) <= 2) check(length(ver) > 0) not null default 01,
+  value text check( length(value) <=4) check(length(value) > 0) not null,
+  param text check( length(param) <=5) check(length(param) > 0) not null,
+  desc text check( length(desc) <=10) check(length(desc) > 0) default 'n/a',
   status text check( status in ('active','inactive','deleted','n/a')) not null default 'n/a',
   rohs text check(rohs in ('yes', 'no', 'n/a')) not null default 'n/a',
   datasheet text check( length(datasheet) <=30) default 'n/a'
@@ -28,14 +28,14 @@ create table tbl1xx (
 -- *************************
 
 create table tbl2xx (
-  grp integer check( length(grp) <=3) not null,
+  grp integer check( length(grp) = 3) not null,
   pn integer primary key autoincrement,
-  ver integer check(length(ver) <=2) not null default '01',
-  value text check( length(value) <=6) not null,
-  param text check( length(param) <=5) not null,
-  desc text check( length(desc) <=10) default 'n/a',
+  ver integer check(length(ver) <= 2) check(length(ver) > 0) not null default 01,
+  value text check( length(value) <=5) check(length(value) > 0) not null,
+  param text check( length(param) <=5) check(length(param) > 0) not null,
+  desc text check( length(desc) <=10) check(length(desc) > 0) default 'n/a',
   status text check( status in ('active','inactive','deleted','n/a')) not null default 'n/a',
-  rohs text check(rohs in ('yes', 'YES', 'no', 'NO', 'n/a')) not null default 'n/a',
+  rohs text check(rohs in ('yes', 'no', 'n/a')) not null default 'n/a',
   datasheet text check( length(datasheet) <=30) default 'n/a'
 );
 
@@ -45,14 +45,14 @@ create table tbl2xx (
 -- *************************
 
 create table tbl3xx (
-  grp integer check( length(grp) <=3) not null,
+  grp integer check( length(grp) = 3) not null,
   pn integer primary key autoincrement,
-  ver integer check(length(ver) <=2) not null default '01',
-  value text check( length(value) <=4) not null,
-  param text check( length(param) <=5) not null,
-  desc text check( length(desc) <=10) default 'n/a',
+  ver integer check(length(ver) <= 2) check(length(ver) > 0) not null default 01,
+  value text check( length(value) <=4) check(length(value) > 0) not null,
+  param text check( length(param) <=5) check(length(param) > 0) not null,
+  desc text check( length(desc) <=10) check(length(desc) > 0) default 'n/a',
   status text check( status in ('active','inactive','deleted','n/a')) not null default 'n/a',
-  rohs text check(rohs in ('yes', 'YES', 'no', 'NO', 'n/a')) not null default 'n/a',
+  rohs text check(rohs in ('yes', 'no', 'n/a')) not null default 'n/a',
   datasheet text check( length(datasheet) <=30) default 'n/a'
 );
 
@@ -62,14 +62,14 @@ create table tbl3xx (
 -- *************************
 
 create table tbl4xx (
-  grp integer check( length(grp) <=3) not null,
+  grp integer check( length(grp) = 3) not null,
   pn integer primary key autoincrement,
-  ver integer check(length(ver) <=2) not null default '01',
-  value text check( length(value) <=4) not null,
-  param text check( length(param) <=5) not null,
-  desc text check( length(desc) <=10) default 'n/a',
+  ver integer check(length(ver) <= 2) check(length(ver) > 0) not null default 01,
+  value text check( length(value) <=4) check(length(value) > 0) not null,
+  param text check( length(param) <=5) check(length(param) > 0) not null,
+  desc text check( length(desc) <=10) check(length(desc) > 0) default 'n/a',
   status text check( status in ('active','inactive','deleted','n/a')) not null default 'n/a',
-  rohs text check(rohs in ('yes', 'YES', 'no', 'NO', 'n/a')) not null default 'n/a',
+  rohs text check(rohs in ('yes', 'no', 'n/a')) not null default 'n/a',
   datasheet text check( length(datasheet) <=30) default 'n/a'
 );
 
@@ -79,14 +79,14 @@ create table tbl4xx (
 -- *************************
 
 create table tbl5xx (
-  grp integer check( length(grp) <=3) not null,
+  grp integer check( length(grp) = 3) not null,
   pn integer primary key autoincrement,
-  ver integer check(length(ver) <=2) not null default '01',
-  value text check( length(value) <=4) not null,
-  param text check( length(param) <=5) not null,
-  desc text check( length(desc) <=10) default 'n/a',
+  ver integer check(length(ver) <= 2) check(length(ver) > 0) not null default 01,
+  value text check( length(value) <=4) check(length(value) > 0) not null,
+  param text check( length(param) <=5) check(length(param) > 0) not null,
+  desc text check( length(desc) <=10) check(length(desc) > 0) default 'n/a',
   status text check( status in ('active','inactive','deleted','n/a')) not null default 'n/a',
-  rohs text check(rohs in ('yes', 'YES', 'no', 'NO', 'n/a')) not null default 'n/a',
+  rohs text check(rohs in ('yes', 'no', 'n/a')) not null default 'n/a',
   datasheet text check( length(datasheet) <=30) default 'n/a'
 );
 
@@ -96,14 +96,14 @@ create table tbl5xx (
 -- *************************
 
 create table tbl6xx (
-  grp integer check( length(grp) <=3) not null,
+  grp integer check( length(grp) = 3) not null,
   pn integer primary key autoincrement,
-  ver integer check(length(ver) <=2) not null default '01',
-  value text check( length(value) <=4) not null,
-  param text check( length(param) <=5) not null,
-  desc text check( length(desc) <=10) default 'n/a',
+  ver integer check(length(ver) <= 2) check(length(ver) > 0) not null default 01,
+  value text check( length(value) <=4) check(length(value) > 0) not null,
+  param text check( length(param) <=5) check(length(param) > 0) not null,
+  desc text check( length(desc) <=10) check(length(desc) > 0) default 'n/a',
   status text check( status in ('active','inactive','deleted','n/a')) not null default 'n/a',
-  rohs text check(rohs in ('yes', 'YES', 'no', 'NO', 'n/a')) not null default 'n/a',
+  rohs text check(rohs in ('yes', 'no', 'n/a')) not null default 'n/a',
   datasheet text check( length(datasheet) <=30) default 'n/a'
 );
 
@@ -112,29 +112,29 @@ create table tbl6xx (
 -- *       Resistor        *
 -- *************************
 
-INSERT INTO tbl1xx (grp, value, param, desc, status, rohs, datasheet) VALUES 
+INSERT INTO tbl1xx (grp, value, param, desc, status, rohs, datasheet) VALUES
 ('101','100','5%','1/16','active','yes','www.google.com');
-INSERT INTO tbl1xx (grp, value, param, desc, status, rohs, datasheet) VALUES 
-('101','1M','5%','1/10','active','n/a','www.ddr.com');
-INSERT INTO tbl1xx (grp, value, param, desc, status, rohs, datasheet) VALUES 
-('102','10k','2%','1/16','inactive','yes','www.test.com');
-INSERT INTO tbl1xx (grp, value, param, desc, status, rohs, datasheet) VALUES 
-('110','100','1%','1/4','deleted','no','asd');
-INSERT INTO tbl1xx (grp, value, param, desc, status, rohs, datasheet) VALUES 
-('111','1k','.1%','1/5','active','yes','www.hestore.com');
+INSERT INTO tbl1xx (grp, value, param, desc, status, rohs, datasheet) VALUES
+(101,'1M','5%','1/10','active','n/a','www.ddr.com');
+INSERT INTO tbl1xx (grp, value, param, desc, status, rohs, datasheet) VALUES
+(102,'10k','2%','1/16','inactive','yes','www.test.com');
+INSERT INTO tbl1xx (grp, value, param, desc, status, rohs, datasheet) VALUES
+(110,'100','1%','1/4','deleted','no','asd');
+INSERT INTO tbl1xx (grp, value, param, desc, status, rohs, datasheet) VALUES
+(111,'1k','.1%','1/5','active','yes','www.hestore.com');
 
 -- *************************
 -- *       Demo Data       *
 -- *       Capacitor       *
 -- *************************
 
-INSERT INTO tbl2xx (grp, value, param, desc, status, rohs, datasheet) VALUES 
+INSERT INTO tbl2xx (grp, value, param, desc, status, rohs, datasheet) VALUES
 ('201','100nF','10V','5%','active','yes','www.google.com');
-INSERT INTO tbl2xx (grp, value, param, desc, status, rohs, datasheet) VALUES 
+INSERT INTO tbl2xx (grp, value, param, desc, status, rohs, datasheet) VALUES
 ('202','10uF','5V','2%','inactive','yes','www.facebook.com');
-INSERT INTO tbl2xx (grp, value, param, desc, status, rohs, datasheet) VALUES 
+INSERT INTO tbl2xx (grp, value, param, desc, status, rohs, datasheet) VALUES
 ('202','1nF','25V','1%','n/a','no','www.test.com');
-INSERT INTO tbl2xx (grp, value, param, desc, status, rohs, datasheet) VALUES 
+INSERT INTO tbl2xx (grp, value, param, desc, status, rohs, datasheet) VALUES
 ('203','100nF','50V','10%','deleted','n/a','qwerty');
 
 -- *************************
@@ -142,11 +142,11 @@ INSERT INTO tbl2xx (grp, value, param, desc, status, rohs, datasheet) VALUES
 -- *     Passive Parts     *
 -- *************************
 
-INSERT INTO tbl3xx (grp, value, param, desc, status, rohs, datasheet) VALUES 
+INSERT INTO tbl3xx (grp, value, param, desc, status, rohs, datasheet) VALUES
 ('301','1k','5%','1/16','active','yes','www.google.com');
-INSERT INTO tbl3xx (grp, value, param, desc, status, rohs, datasheet) VALUES 
+INSERT INTO tbl3xx (grp, value, param, desc, status, rohs, datasheet) VALUES
 ('303','1k','55%','1/6','inactive','no','n/a');
-INSERT INTO tbl3xx (grp, value, param, desc, status, rohs, datasheet) VALUES 
+INSERT INTO tbl3xx (grp, value, param, desc, status, rohs, datasheet) VALUES
 ('310','10k','1%','6','n/a','n/a','www.ddr.com');
 
 -- *************************
@@ -154,11 +154,9 @@ INSERT INTO tbl3xx (grp, value, param, desc, status, rohs, datasheet) VALUES
 -- *      Active Parts     *
 -- *************************
 
-INSERT INTO tbl4xx (grp, value, param, desc, status, rohs, datasheet) VALUES 
+INSERT INTO tbl4xx (grp, value, param, desc, status, rohs, datasheet) VALUES
 ('401','1k','5%','1/16','active','yes','wtest');
-INSERT INTO tbl4xx (grp, value, param, desc, status, rohs, datasheet) VALUES 
+INSERT INTO tbl4xx (grp, value, param, desc, status, rohs, datasheet) VALUES
 ('402','1k','55%','1/6','inactive','no','asd');
-INSERT INTO tbl4xx (grp, value, param, desc, status, rohs, datasheet) VALUES 
+INSERT INTO tbl4xx (grp, value, param, desc, status, rohs, datasheet) VALUES
 ('403','10k','1%','6','n/a','n/a','www.ddr.com');
-
-

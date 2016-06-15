@@ -13,21 +13,35 @@
 
 </head>
 <body>
+	<div class="pull-right">
+{% if (session.get('logged_in_guest') or session.get('logged_in_admin') or session.get('logged_in_engineer')) %}
+		<a  href="{{ url_for('logout') }}">
+			<button type="button" class="btn btn-default" aria-label="mod">
+  			<span class="glyphicon glyphicon-log-out" aria-hidden="true"></span>
+				<label for="{{ url_for('logout') }}">Logout</label>
+			</button></a>
+{% endif %}
+	</div>
+<br>
+<br>
 {% for message in get_flashed_messages() %}
-	<div class = flash> {{ message }}
-		<button onclick="closeWin()" type="button" class="btn btn-default">
-	  	<span class="glyphicon glyphicon-remove" aria-hidden="true"></span>
-		</button></div>
+	<div class = flash> {{ message }} <a class="close" href="{{ request.path }}" align="right">&times</a></div>
 {% endfor %}
 <div class=page>
 {% block body %}
 {% endblock %}
 </div>
-<script>
-var myWindow = <div class = flash>
-function closeWin() {
-    myWindow.close();
-}
-</script>
+<div class="pull-right">
+{% if (session.get('logged_in_guest') or session.get('logged_in_admin') or session.get('logged_in_engineer')) %}
+	<h5>Logged in as:
+{% endif %}
+	{% if session.get('logged_in_guest') %}
+	(Guest)</h5>
+	{% elif session.get('logged_in_engineer') %}
+	(Engineer)</h5>
+	{% elif session.get('logged_in_admin') %}
+	(Admin)</h5>
+	{% endif %}
+</div>
 </body>
 </html>

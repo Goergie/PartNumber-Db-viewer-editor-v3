@@ -11,7 +11,7 @@ drop table if exists tbl6xx;
 -- *************************
 
 create table tbl1xx (
-  grp integer check( length(grp) = 3) not null,
+  grp integer check( length(grp) = 3) check( grp LIKE "1%" ) not null,
   pn integer primary key autoincrement,
   ver integer check(length(ver) <= 2) check(length(ver) > 0) not null default 01,
   value text check( length(value) <=4) check(length(value) > 0) not null,
@@ -28,7 +28,7 @@ create table tbl1xx (
 -- *************************
 
 create table tbl2xx (
-  grp integer check( length(grp) = 3) not null,
+  grp integer check( length(grp) = 3) check( grp LIKE "2%" ) not null,
   pn integer primary key autoincrement,
   ver integer check(length(ver) <= 2) check(length(ver) > 0) not null default 01,
   value text check( length(value) <=5) check(length(value) > 0) not null,
@@ -45,7 +45,7 @@ create table tbl2xx (
 -- *************************
 
 create table tbl3xx (
-  grp integer check( length(grp) = 3) not null,
+  grp integer check( length(grp) = 3) check( grp LIKE "3%" ) not null,
   pn integer primary key autoincrement,
   ver integer check(length(ver) <= 2) check(length(ver) > 0) not null default 01,
   value text check( length(value) <=4) check(length(value) > 0) not null,
@@ -62,7 +62,7 @@ create table tbl3xx (
 -- *************************
 
 create table tbl4xx (
-  grp integer check( length(grp) = 3) not null,
+  grp integer check( length(grp) = 3) check( grp LIKE "4%" ) not null,
   pn integer primary key autoincrement,
   ver integer check(length(ver) <= 2) check(length(ver) > 0) not null default 01,
   value text check( length(value) <=4) check(length(value) > 0) not null,
@@ -79,7 +79,7 @@ create table tbl4xx (
 -- *************************
 
 create table tbl5xx (
-  grp integer check( length(grp) = 3) not null,
+  grp integer check( length(grp) = 3) check( grp LIKE "5%" ) not null,
   pn integer primary key autoincrement,
   ver integer check(length(ver) <= 2) check(length(ver) > 0) not null default 01,
   value text check( length(value) <=4) check(length(value) > 0) not null,
@@ -96,7 +96,7 @@ create table tbl5xx (
 -- *************************
 
 create table tbl6xx (
-  grp integer check( length(grp) = 3) not null,
+  grp integer check( length(grp) = 3) check( grp LIKE "6%" ) not null,
   pn integer primary key autoincrement,
   ver integer check(length(ver) <= 2) check(length(ver) > 0) not null default 01,
   value text check( length(value) <=4) check(length(value) > 0) not null,
@@ -113,7 +113,7 @@ create table tbl6xx (
 -- *************************
 
 INSERT INTO tbl1xx (grp, value, param, desc, status, rohs, datasheet) VALUES
-('101','100','5%','1/16','active','yes','www.google.com');
+(101,'100','5%','1/16','active','yes','www.google.com');
 INSERT INTO tbl1xx (grp, value, param, desc, status, rohs, datasheet) VALUES
 (101,'1M','5%','1/10','active','n/a','www.ddr.com');
 INSERT INTO tbl1xx (grp, value, param, desc, status, rohs, datasheet) VALUES
@@ -129,13 +129,13 @@ INSERT INTO tbl1xx (grp, value, param, desc, status, rohs, datasheet) VALUES
 -- *************************
 
 INSERT INTO tbl2xx (grp, value, param, desc, status, rohs, datasheet) VALUES
-('201','100nF','10V','5%','active','yes','www.google.com');
+(201,'100nF','10V','5%','active','yes','www.google.com');
 INSERT INTO tbl2xx (grp, value, param, desc, status, rohs, datasheet) VALUES
-('202','10uF','5V','2%','inactive','yes','www.facebook.com');
+(202,'10uF','5V','2%','inactive','yes','www.facebook.com');
 INSERT INTO tbl2xx (grp, value, param, desc, status, rohs, datasheet) VALUES
-('202','1nF','25V','1%','n/a','no','www.test.com');
+(202,'1nF','25V','1%','n/a','no','www.test.com');
 INSERT INTO tbl2xx (grp, value, param, desc, status, rohs, datasheet) VALUES
-('203','100nF','50V','10%','deleted','n/a','qwerty');
+(203,'100nF','50V','10%','deleted','n/a','qwerty');
 
 -- *************************
 -- *       Demo Data       *
@@ -143,11 +143,11 @@ INSERT INTO tbl2xx (grp, value, param, desc, status, rohs, datasheet) VALUES
 -- *************************
 
 INSERT INTO tbl3xx (grp, value, param, desc, status, rohs, datasheet) VALUES
-('301','1k','5%','1/16','active','yes','www.google.com');
+(301,'1k','5%','1/16','active','yes','www.google.com');
 INSERT INTO tbl3xx (grp, value, param, desc, status, rohs, datasheet) VALUES
-('303','1k','55%','1/6','inactive','no','n/a');
+(303,'1k','55%','1/6','inactive','no','n/a');
 INSERT INTO tbl3xx (grp, value, param, desc, status, rohs, datasheet) VALUES
-('310','10k','1%','6','n/a','n/a','www.ddr.com');
+(310,'10k','1%','6','n/a','n/a','www.ddr.com');
 
 -- *************************
 -- *       Demo Data       *
@@ -155,8 +155,8 @@ INSERT INTO tbl3xx (grp, value, param, desc, status, rohs, datasheet) VALUES
 -- *************************
 
 INSERT INTO tbl4xx (grp, value, param, desc, status, rohs, datasheet) VALUES
-('401','1k','5%','1/16','active','yes','wtest');
+(401,'1k','5%','1/16','active','yes','wtest');
 INSERT INTO tbl4xx (grp, value, param, desc, status, rohs, datasheet) VALUES
-('402','1k','55%','1/6','inactive','no','asd');
+(402,'1k','55%','1/6','inactive','no','asd');
 INSERT INTO tbl4xx (grp, value, param, desc, status, rohs, datasheet) VALUES
-('403','10k','1%','6','n/a','n/a','www.ddr.com');
+(403,'10k','1%','6','n/a','n/a','www.ddr.com');

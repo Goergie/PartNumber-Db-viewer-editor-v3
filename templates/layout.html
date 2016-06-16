@@ -1,47 +1,48 @@
 <!doctype html>
 <html>
 <head>
-	{% block title %}
+{% block title %}
 	<title>PnVE3</title>
-	{% endblock%}
-		<meta name="viewport" content="width=device-width, initial-scale=1">
-		<meta name="description" content="database editor for OrCAD">
-		<meta name="author" content="qodbop">
+{% endblock%}
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta name="description" content="database editor for OrCAD">
+	<meta name="author" content="qodbop">
 
-		<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/bootstrap.css') }}">
-		<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/own_mod_style.css') }}">
-
+	<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/bootstrap.css') }}">
+	<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/own_mod_style.css') }}">
 </head>
 <body>
 	<div class="pull-right">
 {% if (session.get('logged_in_guest') or session.get('logged_in_admin') or session.get('logged_in_engineer')) %}
-		<a  href="{{ url_for('logout') }}">
+		<a href="{{ url_for('logout') }}">
 			<button type="button" class="btn btn-default" aria-label="mod">
-  			<span class="glyphicon glyphicon-log-out" aria-hidden="true"></span>
+  				<span class="glyphicon glyphicon-log-out" aria-hidden="true"></span>
 				<label for="{{ url_for('logout') }}">Logout</label>
 			</button></a>
 {% endif %}
 	</div>
-<br>
-<br>
+	<br>
+	<br>
 {% for message in get_flashed_messages() %}
-	<div class = flash> {{ message }} <a class="close" href="{{ request.path }}" align="right">&times</a></div>
+	<div class = flash>
+	{{ message }} <a class="close" href="{{ request.path }}" align="right">&times</a>
+	</div>
 {% endfor %}
-<div class=page>
+	<div class=page>
 {% block body %}
 {% endblock %}
-</div>
-<div class="pull-right">
+	</div>
+	<div class="pull-right">
 {% if (session.get('logged_in_guest') or session.get('logged_in_admin') or session.get('logged_in_engineer')) %}
-	<h5>Logged in as:
+		<h5>Logged in as:
 {% endif %}
-	{% if session.get('logged_in_guest') %}
-	(Guest)</h5>
-	{% elif session.get('logged_in_engineer') %}
-	(Engineer)</h5>
-	{% elif session.get('logged_in_admin') %}
-	(Admin)</h5>
-	{% endif %}
-</div>
+{% if session.get('logged_in_guest') %}
+		(Guest)</h5>
+{% elif session.get('logged_in_engineer') %}
+		(Engineer)</h5>
+{% elif session.get('logged_in_admin') %}
+		(Admin)</h5>
+{% endif %}
+	</div>
 </body>
 </html>

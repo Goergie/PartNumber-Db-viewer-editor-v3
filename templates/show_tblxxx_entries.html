@@ -1,119 +1,126 @@
-<!--{#{% if not session.get('logged_in_') %}#}
-<div>
-  <a class="pull-right" href="{{ url_for('login') }}">
-    <button type="button" class="btn btn-default" aria-label="mod">
-      <span class="glyphicon glyphicon-log-in" aria-hidden="true"></span>
-      <label for="{{ url_for('login') }}">Login</label>
-    </button></a></div>
-{#{% endif %}#}-->
 {% extends "layout.html"%}
 {% block body %}
-  <h1 align="center">Partnumber Database Viewer-Editor v3</h1>
+    <h1 align="center">Partnumber Database Viewer-Editor v3</h1>
+
 {# <!--Add entry--> #}
-{% if not session.get('logged_in_guest')%}
- 	<form action="{{ url_for('add_tbl1xx_entry') }}" method=post class="form-inline" role="add_row_form">
-		<h3>Add row</h3>
-    <hr>
-{% for col in cols %}
-	{% if col != 'status' and col != 'rohs' and col !='pn' %}
-		<div class="form-group">
-			&nbsp; <label for="{{col}}">{{col}}: &nbsp; </label><input type="text" size="10" name="{{col}}" id="{{col}}">
-		</div>
-	{% endif %}
-	{% if col == 'status'%}
-		<div class="form-group dropdown">
-			<label for="{{col}}">&nbsp; {{col}}: &nbsp;</label>
-			<select class="form-control text-center" id="{{col}}" name="{{col}}">
-				<option value="active">Active</option>
-				<option value="inactive">Inactive</option>
-				<option value="deleted">Deleted</option>
-				<option value="n/a">n/a</option>
-			</select>
-		</div>
-	{% endif %}
-	{% if col == 'rohs'%}
-		<div class="form-group dropdown">
-			<label for={{col}}>&nbsp;{{col}}:&nbsp;</label>
-			<select class="form-control text-center" id="{{col}}" name="{{col}}">
-				<option value="yes">Yes</option>
-				<option value="no">No</option>
-				<option value="n/a">n/a</option>
-			</select>
-		</div>
-	{% endif %}
-{% endfor %}
-		<div class="form-group pull-right">
-		 <input type="submit" class="btn btn-success" value="Add"> &nbsp;&nbsp;
-		</div>
-	</form>
-<hr>
-{% endif %}
-<br>
-	<div class="btn-group">
-  	<button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="false" aria-expanded="false">Select table
-    	<span class="caret"></span>
-  	</button>
-  	<ul class="dropdown-menu" aria-labelledby="tableSelect">
-{% for tbl in tbls %}
-			<li><a href="{{ url_for('show_tbl1xx_entries') }}">{{tbl}}</a></li>
-{% endfor %}
-  	</ul>
-	</div>
-  <br>
-<br>
-{# <!--Table view--> #}
-	<div style="overflow-x:auto">
-		<table width=100%  border="1px solid black" border-collapse="collapse">
-			<tr>
-{% for col in cols %}
-				<th>{{col}}</th>
-{% endfor %}
-{% if not session.get('logged_in_guest') %}
-  {% if session.get('logged_in_admin') %}
-				<th width="50px">Mod</th>
-  {% endif %}
-				<th width="50px">Del</th>
-				<th width="120px">Select<input type="checkbox" class="check pull-right" id="checkAll"></th>
-{% endif %}
-			</tr>
-{% set cols_num = cols | length %}
-{% for row in rows %}
-			<tr>
-	{% for i in range(cols_num) %}
-				<td>{{ row[i] }}</td>
-		{% if i == 1 %}
-			{% set pn = row[i] %}
-		{% endif %}
-    {% if not session.get('logged_in_guest') %}
-		  {% if i == (cols_num - 1) %}
-        {% if session.get('logged_in_admin') %}
-				<td><a href="{{ url_for('mod_tbl1xx_entry_page',pk=pn) }}">
-					<button type="button" class="btn btn-default" aria-label="mod">
-						<span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
-					</button></td>
-        {% endif %}
-				<td><form action="{{ url_for('del_tbl1xx_entry') }}" method=post>
-					<input type="hidden" id={{pn}} name="delete" value="{{pn}}">
-							<button onclick="return confirm('Are you sure you want to delete this entry?')" type="submit" class="btn btn-default" aria-label="mod">
-								<span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-							</button></td>
-					</input>
-				<td><input class="check" type="checkbox" value={{pn}}></td></form>
-      </tr>
-      {% endif %}
+    {% if not session.get('logged_in_guest')%}
+        <h3>Add row</h3>
+        <hr>
+        <form action="{{ url_for('add_tbl1xx_entry') }}" method=post class="form-inline" role="add_row_form">
+            {% for col in cols %}
+                {% if col != 'status' and col != 'rohs' and col !='pn' %}
+                    <div class="form-group">
+                        &nbsp; <label for="{{col}}">{{col}}: &nbsp; </label><input type="text" size="10" name="{{col}}" id="{{col}}">
+                    </div>
+                {% endif %}
+                {% if col == 'status'%}
+                    <div class="form-group dropdown">
+                        <label for="{{col}}">&nbsp; {{col}}: &nbsp;</label>
+                        <select class="form-control text-center" id="{{col}}" name="{{col}}">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                            <option value="deleted">Deleted</option>
+                            <option value="n/a">n/a</option>
+                        </select>
+                    </div>
+                {% endif %}
+                {% if col == 'rohs'%}
+                    <div class="form-group dropdown">
+                        <label for={{col}}>&nbsp;{{col}}:&nbsp;</label>
+                        <select class="form-control text-center" id="{{col}}" name="{{col}}">
+                            <option value="yes">Yes</option>
+                            <option value="no">No</option>
+                            <option value="n/a">n/a</option>
+                        </select>
+                    </div>
+                {% endif %}
+            {% endfor %}
+            <div class="form-group pull-right">
+                <input type="submit" class="btn btn-success" value="Add"> &nbsp;&nbsp;
+            </div>
+        </form>
+        <hr>
     {% endif %}
-	{% endfor %}
-{% else %}
-	<strong><em>No entries here so far</em></strong>
-{% endfor %}
-		</table>
+    <br>
+
+{# <!--Table Dropdown--> #}
+    <div class="btn-group">
+        <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown" aria-haspopup="false" aria-expanded="false">Select table
+            <span class="caret"></span>
+        </button>
+        <ul class="dropdown-menu" aria-labelledby="tableSelect">
+            {% for tbl in tbls %}
+                <li><a href="{{ url_for('show_tbl1xx_entries') }}">{{tbl}}</a></li>
+            {% endfor %}
+        </ul>
+    </div>
+    <br>
+    <br>
+
+{# <!--Table view--> #}
+    <div style="overflow-x:auto">
+        <table width=100%  border="1px solid black" border-collapse="collapse">
+
+{# <!--Table Header--> #}
+    {% if rows == [] %}
+        <strong><em>No entries here so far</em></strong>
+    {% else %}
+            <tr>
+                {% for col in cols %}
+                    <th>{{col}}</th>
+                {% endfor %}
+                {% if not session.get('logged_in_guest') %}
+                    {% if session.get('logged_in_admin') %}
+                        <th width="50px">Mod</th>
+                    {% endif %}
+                    <th width="50px">Del</th>
+                    <th width="120px">Select<input type="checkbox" class="check pull-right" id="checkAll"></th>
+                {% endif %}
+            </tr>
+    {% endif %}
+{% set cols_num = cols | length %}
+        {% for row in rows %}
+            <tr>
+                {% for i in range(cols_num) %}
+                <td>{{ row[i] }}</td>
+                    {% if i == 1 %}
+                        {% set pn = row[i] %}
+                    {% endif %}
+                    {% if not session.get('logged_in_guest') %}
+                        {% if i == (cols_num - 1) %}
+                            {% if session.get('logged_in_admin') %}
+                <td><a href="{{ url_for('mod_tbl1xx_entry_page',pk=pn) }}">
+                    <button type="button" class="btn btn-default" aria-label="mod">
+                        <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+                    </button>
+                </td>
+                            {% endif %}
+                <td>
+                    <form action="{{ url_for('del_tbl1xx_entry') }}" method=post>
+                        <input type="hidden" id={{pn}} name="delete" value="{{pn}}">
+                            <button onclick="return confirm('Are you sure you want to delete this entry?')" type="submit" class="btn btn-default" aria-label="mod">
+                                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                            </button>
+                        </input>
+                    </form>
+                </td>
+                <td>
+                    <input class="check" type="checkbox" value={{pn}}>
+                </td>
+            </tr>
+                        {% endif %} {# if i == (cols_num - 1) #}
+                    {% endif %} {# if not session.get('logged_in_guest') #}
+                {% endfor %} {# for i in range(cols_num) #}
+        {% endfor %}
+        </table>
 	</div>
+{# <!--Add script location--> #}
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
 <script src="{{ url_for('static', filename='js/bootstrap.js') }}" type="text/javascript"></script>
 {# <!--Script for checking all checkboxs--> #}
 <script>
-$("#checkAll").click(function() {
-  $(".check").prop('checked', $(this).prop('checked'));
-});
+    $("#checkAll").click(function() {
+        $(".check").prop('checked', $(this).prop('checked'));
+    });
 </script>
 {% endblock %}

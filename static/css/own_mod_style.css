@@ -1,0 +1,8 @@
+tr:nth-child(even)	{ background-color: #e6e6e6;}
+th, td							{ padding: 10px; text-align: center;}
+
+.page								{ margin: 2% auto; width: 90%; border: 5px solid #ccc;
+                      padding: 0.8em; background: white; }
+.dropdown-menu      { min-width: 50px; text-align: center;}
+.flash              { background: #cee5F5; padding: 0.5em;
+                      border: 1px solid #aacbe2; }

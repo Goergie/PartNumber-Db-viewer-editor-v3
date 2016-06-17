@@ -16,7 +16,7 @@
 {% if (session.get('logged_in_guest') or session.get('logged_in_admin') or session.get('logged_in_engineer')) %}
 		<a href="{{ url_for('logout') }}">
 			<button type="button" class="btn btn-default" aria-label="mod">
-  				<span class="glyphicon glyphicon-log-out" aria-hidden="true"></span>
+				<span class="glyphicon glyphicon-log-out" aria-hidden="true"></span>
 				<label for="{{ url_for('logout') }}">Logout</label>
 			</button></a>
 {% endif %}

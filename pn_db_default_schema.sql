@@ -159,4 +159,4 @@ INSERT INTO tbl4xx (grp, value, param, desc, status, rohs, datasheet) VALUES
 INSERT INTO tbl4xx (grp, value, param, desc, status, rohs, datasheet) VALUES
 (402,'1k','55%','1/6','inactive','no','asd');
 INSERT INTO tbl4xx (grp, value, param, desc, status, rohs, datasheet) VALUES
-(403,'10k','1%','6','n/a','n/a','www.ddr.com');
+(403,'10k','1%','1/6','n/a','n/a','www.ddr.com');

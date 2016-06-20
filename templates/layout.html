@@ -5,7 +5,8 @@
 	<title>PnVE3</title>
 {% endblock%}
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<meta name="description" content="database editor for OrCAD">
+	<meta name="description" content="database viewer and editor for OrCAD">
+	<meta name="keywords" contextmenu="Database,viewer,editor,db,orcad">
 	<meta name="author" content="qodbop">
 
 	<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/bootstrap.css') }}">
@@ -21,6 +22,7 @@
 			</button></a>
 {% endif %}
 	</div>
+	<br>
 	<br>
 	<br>
 {% for message in get_flashed_messages() %}

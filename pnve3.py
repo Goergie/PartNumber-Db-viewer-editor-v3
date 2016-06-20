@@ -57,7 +57,6 @@ def select_table():
 def show_tblxxx_entries():
     if (not session.get('logged_in_guest') and not session.get('logged_in_engineer') and not session.get('logged_in_admin')):
         return redirect('login')
-    print(globvar_table_select) #DEBUG
     template_data = {}
     select_sql_query = "SELECT * FROM %s" % globvar_table_select
     #cursor_partnumber = g.db.execute('select grp || '-' || substr('00000'||pn,-5,5) || '-' || ver from tbl1xx as partnumber')
@@ -128,16 +127,20 @@ def login():
         if (request.form['username'] == app.config['USERNAME_USER_LEVEL'] and
             request.form['password'] == app.config['PASSWORD_USER_LEVEL']):
                 session['logged_in_guest'] = True
+                global globvar_table_select
+                globvar_table_select = 'tbl1xx'
                 flash('You were logged in as a guest level user')
                 return redirect(url_for('show_tblxxx_entries'))
         elif (request.form['username'] == app.config['USERNAME_ENGINEER_LEVEL'] and
             request.form['password'] == app.config['PASSWORD_ENGINEER_LEVEL']):
                 session['logged_in_engineer'] = True
+                globvar_table_select = 'tbl1xx'
                 flash('You were logged in as an engineer level user')
                 return redirect(url_for('show_tblxxx_entries'))
         elif (request.form['username'] == app.config['USERNAME_ADMIN_LEVEL'] and
             request.form['password'] == app.config['PASSWORD_ADMIN_LEVEL']):
                 session['logged_in_admin'] = True
+                globvar_table_select = 'tbl1xx'
                 flash('You were logged in as an admin level user')
                 return redirect(url_for('show_tblxxx_entries'))
         else:

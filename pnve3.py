@@ -83,7 +83,7 @@ def add_tblxxx_entry():
     flash('New entry was successfully posted')
     return redirect(url_for('show_tblxxx_entries'))
 
-@app.route('/deltblxxx', methods=['POST'])
+@app.route('/del_tblxxx_entry', methods=['POST'])
 def del_tblxxx_entry():
     if (not session.get('logged_in_admin') and not session.get('logged_in_engineer')):
         abort(401)
@@ -91,6 +91,20 @@ def del_tblxxx_entry():
     g.db.execute(sql_del_query,[request.form['delete']])
     g.db.commit()
     flash('Entry was successfully deleted')
+    return redirect(url_for('show_tblxxx_entries'))
+
+@app.route('/del_multiple_tblxxx_entry', methods=['POST'])
+def del_multiple_tblxxx_entry():
+    checkedValues = request.form.getlist('multiple_del[]')
+    print(checkedValues)
+    if (not session.get('logged_in_admin') and not session.get('logged_in_engineer')):
+        abort(401)
+    sql_multiple_del_query = "DELETE FROM %s WHERE pn=?" %globvar_table_select
+    for element in checkedValues:
+        print(element)
+        g.db.execute(sql_multiple_del_query,[element])
+        g.db.commit()
+    flash('Entries were successfully deleted')
     return redirect(url_for('show_tblxxx_entries'))
 
 @app.route('/mod_tblxxx_entry_page/<pk>')

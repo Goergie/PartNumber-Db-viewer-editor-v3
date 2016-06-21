@@ -16,7 +16,7 @@
 	<div class="pull-right">
 {% if (session.get('logged_in_guest') or session.get('logged_in_admin') or session.get('logged_in_engineer')) %}
 		<a href="{{ url_for('logout') }}">
-			<button type="button" class="btn btn-default" aria-label="mod">
+			<button type="button" class="btn btn-default" aria-label="logout">
 				<span class="glyphicon glyphicon-log-out" aria-hidden="true"></span>
 				<label for="{{ url_for('logout') }}">Logout</label>
 			</button></a>
@@ -26,8 +26,13 @@
 	<br>
 	<br>
 {% for message in get_flashed_messages() %}
-	<div class = flash>
-	{{ message }} <a class="close" href="{{ request.path }}" align="right">&times</a>
+<!--	<div class="flash bg-info">
+		<span class="text-muted">{{ message }}</span> <a class="close" href="{{ request.path }}" align="right" aria-label="close">&times</a>
+	</div>-->
+	<div class="container">
+		<div class="alert alert-info fade in">
+			{{ message }} <a class="close" href="#" data-dismiss="alert" align="right" aria-label="close">&times</a>
+		</div>
 	</div>
 {% endfor %}
 	<div class=page>

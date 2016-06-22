@@ -6,13 +6,13 @@
     {% endif %}
     <form action="{{ url_for('login') }}" method=post>
         <dl>
-            <dt>Username:<dd><input type=text name=username>
+            <dt>Username:<dd><input type="text" name="username" placeholder="Username">
             <br>
             <br>
-            <dt>Password:<dd><input type=password name=password>
+            <dt>Password:<dd><input type="password" name="password" placeholder="Password">
             <br>
             <br>
-            <dd><input type=submit value=Login>
+            <dd><input type="submit" value="Login">
         </dl>
     </form>
 {% endblock %}

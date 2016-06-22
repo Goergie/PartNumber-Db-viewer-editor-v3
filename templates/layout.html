@@ -9,8 +9,9 @@
 	<meta name="keywords" contextmenu="Database,viewer,editor,db,orcad">
 	<meta name="author" content="qodbop">
 
-	<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/bootstrap.css') }}">
-	<link rel=stylesheet type=text/css href="{{ url_for('static', filename='css/own_mod_style.css') }}">
+	<link rel="stylesheet" type=text/css href="{{ url_for('static', filename='css/bootstrap.css') }}">
+	<link rel="stylesheet" type=text/css href="{{ url_for('static', filename='css/own_mod_style.css') }}">
+	<link href="https://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet">
 </head>
 <body>
 	<div class="pull-right">
@@ -31,25 +32,41 @@
 	</div>-->
 	<div class="container">
 		<div class="alert alert-info fade in">
-			{{ message }} <a class="close" href="#" data-dismiss="alert" align="right" aria-label="close">&times</a>
+			{{ message }} <a class="close" href="#" data-dismiss="alert" aria-label="close">&times</a>
 		</div>
 	</div>
 {% endfor %}
-	<div class=page>
+	<div class="page">
 {% block body %}
 {% endblock %}
 	</div>
-	<div class="pull-right">
-{% if (session.get('logged_in_guest') or session.get('logged_in_admin') or session.get('logged_in_engineer')) %}
-		<h5>Logged in as:
+{% if request.path == '/' %}
+	<footer class="container-fluid text-center">
+		<div>
+			<a href="{{ request.path }}" data-toggle="tooltip" title="Return to top">
+				<span class="glyphicon glyphicon-chevron-up"></span>
+			</a>
+		</div>
+		<div class="pull-right" style="color: white">
+	{% if (session.get('logged_in_guest') or session.get('logged_in_admin') or session.get('logged_in_engineer')) %}
+			<h5>Logged in as:
+	{% endif %}
+	{% if session.get('logged_in_guest') %}
+			(Guest)</h5>
+	{% elif session.get('logged_in_engineer') %}
+			(Engineer)</h5>
+	{% elif session.get('logged_in_admin') %}
+			(Admin)</h5>
+	{% endif %}
+		</div>
+		<br>
+		<br>
+		<p style="color: white">Made by qodbop</p>
+	</footer>
 {% endif %}
-{% if session.get('logged_in_guest') %}
-		(Guest)</h5>
-{% elif session.get('logged_in_engineer') %}
-		(Engineer)</h5>
-{% elif session.get('logged_in_admin') %}
-		(Admin)</h5>
-{% endif %}
-	</div>
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
+<script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+{% block script %}
+{% endblock %}
 </body>
 </html>

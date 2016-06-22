@@ -1,13 +1,13 @@
 {% extends "layout.html"%}
 {% block body %}
 <h3>Modify row</h3>
-<form action="{{ url_for('mod_tblxxx_entry') }}" method=post class="form-inline" role="add_row_form">
-  <input type="hidden" id={{pn}} name="modify" value="{{pn}}">
+<form action="{{ url_for('mod_tblxxx_entry') }}" method="post" class="form-inline" role="add_row_form">
+  <input type="hidden" id="{{pn}}" name="modify" value="{{pn}}">
 {% set cols_num = cols | length %}
 {% for col in cols %}
   {% if col != 'status' and col != 'rohs' and col !='pn' %}
     <div class="form-group">
-      <label for="{{col}}">&nbsp; {{col}}: &nbsp;</label><input type=text size=10 name={{col}} id="{{col}}">
+      <label for="{{col}}">&nbsp; {{col}}: &nbsp;</label><input type="text" size="10" name="{{col}}" id="{{col}}">
     </div>
   {% endif %}
   {% if col == 'status'%}
@@ -23,7 +23,7 @@
   {% endif %}
   {% if col == 'rohs'%}
     <div class="form-group dropdown">
-      <label for={{col}}>&nbsp; {{col}}: &nbsp;</label>
+      <label for="{{col}}">&nbsp; {{col}}: &nbsp;</label>
       <select class="form-control text-center" id="{{col}}" name="{{col}}">
         <option value="yes">Yes</option>
         <option value="no">No</option>
@@ -41,5 +41,9 @@
 
 </form>
 <br>
-<a href="{{ url_for('show_tblxxx_entries') }}">back</a>
+<a href="{{ url_for('show_tblxxx_entries') }}" data-toggle="tooltip" title="Back">
+    <button type="button" class="btn btn-default" aria-label="back">
+        <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> Back
+    </button>
+</a>
 {% endblock %}

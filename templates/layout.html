@@ -7,6 +7,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
 	<meta name="description" content="database viewer and editor for OrCAD">
 	<meta name="keywords" contextmenu="Database,viewer,editor,db,orcad">
+	<meta name="google-signin-client_id" content="697582317644-j2hlr3cmofm19cjibkm3ka0o5k9uf5ek.apps.googleusercontent.com">
 	<meta name="author" content="qodbop">
 
 	<link rel="stylesheet" type=text/css href="{{ url_for('static', filename='css/bootstrap.css') }}">
@@ -22,6 +23,15 @@
 				<label for="{{ url_for('logout') }}">Logout</label>
 			</button></a>
 {% endif %}
+	</div>
+	<br>
+	<br>
+	<div class="pull-right">
+		<a href="{{ url_for('logout') }}" onclick="signOut();">
+			<button type="button" class="btn btn-default" aria-label="logout">
+				<span class="glyphicon glyphicon-log-out" aria-hidden="true"></span>
+				<label for="{{ url_for('logout') }}">Sign Out</label>
+			</button></a>
 	</div>
 	<br>
 	<br>
@@ -64,8 +74,17 @@
 		<p style="color: white">Made by qodbop</p>
 	</footer>
 {% endif %}
+<script>
+  function signOut() {
+    var auth2 = gapi.auth2.getAuthInstance();
+    auth2.signOut().then(function () {
+      console.log('User signed out.');
+    });
+  }
+</script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
 <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
+<script src="https://apis.google.com/js/platform.js?onload=renderButton" async defer></script>
 {% block script %}
 {% endblock %}
 </body>

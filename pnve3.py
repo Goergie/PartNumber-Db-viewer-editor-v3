@@ -5,6 +5,8 @@ from flask_bootstrap import Bootstrap
 from flask import Flask, request, session, g, redirect, url_for, \
     abort, render_template, flash
 from contextlib import closing
+from oauth2client import client, crypt
+from apiclient.discovery import build
 
 # configuration
 cwd = os.getcwd()
@@ -44,6 +46,7 @@ def teardown_request_fromdb(exception):
     if db is not None:
         db.close()
 
+#Used to select table from database via dropdown form on html side (no SQL Injection)
 @app.route('/table_select', methods=['POST'])
 def select_table():
     table_data = {}
@@ -53,6 +56,8 @@ def select_table():
     flash('Table %s selected' % globvar_table_select)
     return redirect(url_for('show_tblxxx_entries'))
 
+#Main page after login
+#View of tbl1xx as default
 @app.route('/')
 def show_tblxxx_entries():
     if (not session.get('logged_in_guest') and not session.get('logged_in_engineer') and not session.get('logged_in_admin')):
@@ -67,9 +72,11 @@ def show_tblxxx_entries():
     template_data["tbls"] = map(lambda x: x[0], tbl_select.fetchall())
     template_data["cols"] = list(map(lambda x: x[0], cursor.description))
     template_data["actual_tbl"] = globvar_table_select
-    #template_data["pn"] = cursor_partnumber_fetchall()
+    #template_data["pn"] = cursor_partnumber.fetchall()
     return render_template('show_tblxxx_entries.html', **template_data)
 
+#Used to add another row to database. Still need to check several forms for SQL Injection
+# Found on / between <hr> tags
 @app.route('/addtblxxx', methods=['POST'])
 def add_tblxxx_entry():
     if (not session.get('logged_in_admin') and not session.get('logged_in_engineer')):
@@ -83,6 +90,8 @@ def add_tblxxx_entry():
     flash('New entry was successfully posted')
     return redirect(url_for('show_tblxxx_entries'))
 
+#Used to delete a row from the database if correct user level logged in.
+# Found on / page in a seperate <td> tag in tables
 @app.route('/del_tblxxx_entry', methods=['POST'])
 def del_tblxxx_entry():
     if (not session.get('logged_in_admin') and not session.get('logged_in_engineer')):
@@ -93,20 +102,22 @@ def del_tblxxx_entry():
     flash('Entry was successfully deleted')
     return redirect(url_for('show_tblxxx_entries'))
 
+#Used to delete multiple rows from the database at once.
+#Checks for checked checkboxes and sends primary key one at a time to database to delete
+#No sql Injection
 @app.route('/del_multiple_tblxxx_entry', methods=['POST'])
 def del_multiple_tblxxx_entry():
     checkedValues = request.form.getlist('multiple_del[]')
-    print(checkedValues)
     if (not session.get('logged_in_admin') and not session.get('logged_in_engineer')):
         abort(401)
     sql_multiple_del_query = "DELETE FROM %s WHERE pn=?" %globvar_table_select
     for element in checkedValues:
-        print(element)
         g.db.execute(sql_multiple_del_query,[element])
         g.db.commit()
     flash('Entries were successfully deleted')
     return redirect(url_for('show_tblxxx_entries'))
 
+#Simular code to main page. Redirects user to new page to modify the current values of selected database rows
 @app.route('/mod_tblxxx_entry_page/<pk>')
 def mod_tblxxx_entry_page(pk):
     template_data = {}
@@ -122,6 +133,7 @@ def mod_tblxxx_entry_page(pk):
     template_data["pn"] = pk
     return render_template('mod_form.html', **template_data)
 
+#Used to receive values from html form if user level is highest
 @app.route('/mod_tblxxx_entry', methods=['POST'])
 def mod_tblxxx_entry():
     if not session.get('logged_in_admin'):
@@ -134,6 +146,8 @@ def mod_tblxxx_entry():
     flash('New entry was successfully modified')
     return redirect(url_for('show_tblxxx_entries'))
 
+#Checkes if user name and password are the same as hardcoded ones.
+# If match is found user lelvel assigned and user rights level session changed to true
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     permission_error = None
@@ -161,6 +175,7 @@ def login():
             permission_error = 'Invalid username or password'
     return render_template('login.html', permission_error = permission_error)
 
+#If logout button is pressed then user session is popped and filled with none
 @app.route('/logout')
 def logout():
     session.pop('logged_in_guest', None)

@@ -1,10 +1,15 @@
 # all the imports
 import sqlite3
 import os
+import json
+import httplib2
+
 from flask_bootstrap import Bootstrap
 from flask import Flask, request, session, g, redirect, url_for, \
     abort, render_template, flash
+
 from contextlib import closing
+
 from oauth2client import client, crypt
 from apiclient.discovery import build
 

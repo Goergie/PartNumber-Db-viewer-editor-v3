@@ -27,7 +27,7 @@
 	<br>
 	<br>
 	<div class="pull-right">
-		<a href="{{ url_for('logout') }}" onclick="signOut();">
+		<a href="#" onclick="signOut();">
 			<button type="button" class="btn btn-default" aria-label="logout">
 				<span class="glyphicon glyphicon-log-out" aria-hidden="true"></span>
 				<label for="{{ url_for('logout') }}">Sign Out</label>
@@ -85,6 +85,7 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
 <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 <script src="https://apis.google.com/js/platform.js?onload=renderButton" async defer></script>
+<script src="https://apis.google.com/js/api.js"></script>
 {% block script %}
 {% endblock %}
 </body>

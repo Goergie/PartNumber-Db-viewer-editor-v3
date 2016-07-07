@@ -17,25 +17,16 @@
 <body>
 	<div class="pull-right">
 {% if (session.get('logged_in_guest') or session.get('logged_in_admin') or session.get('logged_in_engineer')) %}
-		<a href="{{ url_for('logout') }}">
-			<button type="button" class="btn btn-default" aria-label="logout">
+		<a href="#" onclick="signOut();">
+			<button type="button" class="btn btn-default" aria-label="signout" >
 				<span class="glyphicon glyphicon-log-out" aria-hidden="true"></span>
-				<label for="{{ url_for('logout') }}">Logout</label>
+				<label for="{{ url_for('logout') }}">Sign Out</label>
 			</button></a>
 {% endif %}
 	</div>
 	<br>
 	<br>
-	<div class="pull-right">
-		<a href="#" onclick="signOut();">
-			<button type="button" class="btn btn-default" aria-label="logout">
-				<span class="glyphicon glyphicon-log-out" aria-hidden="true"></span>
-				<label for="{{ url_for('logout') }}">Sign Out</label>
-			</button></a>
-	</div>
-	<br>
-	<br>
-	<br>
+
 {% for message in get_flashed_messages() %}
 <!--	<div class="flash bg-info">
 		<span class="text-muted">{{ message }}</span> <a class="close" href="{{ request.path }}" align="right" aria-label="close">&times</a>
@@ -71,22 +62,26 @@
 		</div>
 		<br>
 		<br>
-		<p style="color: white">Made by qodbop</p>
+		<p style="color:white">Made by qodbop</p>
 	</footer>
 {% endif %}
-<script>
-  function signOut() {
-    var auth2 = gapi.auth2.getAuthInstance();
-    auth2.signOut().then(function () {
-      console.log('User signed out.');
-    });
-  }
-</script>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
 <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 <script src="https://apis.google.com/js/platform.js?onload=renderButton" async defer></script>
 <script src="https://apis.google.com/js/api.js"></script>
 {% block script %}
 {% endblock %}
+<script>
+	gapi.load('auth2', function() {
+        gapi.auth2.init();
+    });
+  function signOut() {
+    var auth2 = gapi.auth2.getAuthInstance();
+    auth2.signOut().then(function () {
+      console.log('User signed out.');
+	  window.location = "{{ url_for('logout') }}";
+    });
+  }
+</script>
 </body>
 </html>

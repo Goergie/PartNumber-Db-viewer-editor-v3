@@ -59,9 +59,11 @@
             </select>
         </div>
     </form>
+    {% if not session.get('logged_in_guest') %}
         <div class="pull-right">
             <button class="btn btn-default" type="submit" name="mul_del" id="mul_del">Multiple Delete</button>
         </div>
+    {% endif %}
     <br>
     <br>
     <br>

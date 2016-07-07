@@ -3,10 +3,12 @@ import sqlite3
 import os
 import json
 import httplib2
+import base64
+import jwt
 
 from flask_bootstrap import Bootstrap
 from flask import Flask, request, session, g, redirect, url_for, \
-    abort, render_template, flash
+    abort, render_template, flash, jsonify
 
 from contextlib import closing
 
@@ -65,8 +67,9 @@ def select_table():
 #View of tbl1xx as default
 @app.route('/')
 def show_tblxxx_entries():
-    if (not session.get('logged_in_guest') and not session.get('logged_in_engineer') and not session.get('logged_in_admin')):
-        return redirect('login')
+    if (not session.get('logged_in_admin') and not session.get('logged_in_guest')):
+         print ("inside here")
+         return redirect(url_for('login'))
     template_data = {}
     select_sql_query = "SELECT * FROM %s" % globvar_table_select
     #cursor_partnumber = g.db.execute('select grp || '-' || substr('00000'||pn,-5,5) || '-' || ver from tbl1xx as partnumber')
@@ -84,8 +87,6 @@ def show_tblxxx_entries():
 # Found on / between <hr> tags
 @app.route('/addtblxxx', methods=['POST'])
 def add_tblxxx_entry():
-    if (not session.get('logged_in_admin') and not session.get('logged_in_engineer')):
-        abort(401)
     sql_add_query = "INSERT INTO %s (grp, ver, value, param, desc, status, rohs, datasheet) \
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)" % globvar_table_select
     g.db.execute(sql_add_query,
@@ -99,8 +100,6 @@ def add_tblxxx_entry():
 # Found on / page in a seperate <td> tag in tables
 @app.route('/del_tblxxx_entry', methods=['POST'])
 def del_tblxxx_entry():
-    if (not session.get('logged_in_admin') and not session.get('logged_in_engineer')):
-        abort(401)
     sql_del_query = "DELETE FROM %s WHERE pn=?" %globvar_table_select
     g.db.execute(sql_del_query,[request.form['delete']])
     g.db.commit()
@@ -113,8 +112,6 @@ def del_tblxxx_entry():
 @app.route('/del_multiple_tblxxx_entry', methods=['POST'])
 def del_multiple_tblxxx_entry():
     checkedValues = request.form.getlist('multiple_del[]')
-    if (not session.get('logged_in_admin') and not session.get('logged_in_engineer')):
-        abort(401)
     sql_multiple_del_query = "DELETE FROM %s WHERE pn=?" %globvar_table_select
     for element in checkedValues:
         g.db.execute(sql_multiple_del_query,[element])
@@ -141,8 +138,6 @@ def mod_tblxxx_entry_page(pk):
 #Used to receive values from html form if user level is highest
 @app.route('/mod_tblxxx_entry', methods=['POST'])
 def mod_tblxxx_entry():
-    if not session.get('logged_in_admin'):
-        abort(401)
     sql_update_query = "UPDATE %s SET grp = ?, ver = ?, value = ?, param = ?, desc = ?, status = ?, rohs = ?, \
         datasheet = ? WHERE pn = ?" %globvar_table_select
     g.db.execute(sql_update_query, [request.form['grp'], request.form['ver'], request.form['value'], request.form['param'],
@@ -151,34 +146,36 @@ def mod_tblxxx_entry():
     flash('New entry was successfully modified')
     return redirect(url_for('show_tblxxx_entries'))
 
-#Checkes if user name and password are the same as hardcoded ones.
-# If match is found user lelvel assigned and user rights level session changed to true
-@app.route('/login', methods=['GET', 'POST'])
+@app.route('/verify', methods=['POST'])
+def verify():
+    id_token_encoded = request.form['id']
+    try:
+        idinfo = client.verify_id_token(id_token_encoded,"697582317644-j2hlr3cmofm19cjibkm3ka0o5k9uf5ek.apps.googleusercontent.com")
+# If multiple clients access the backend server:
+        if idinfo['aud'] not in ["697582317644-j2hlr3cmofm19cjibkm3ka0o5k9uf5ek.apps.googleusercontent.com"]:
+            raise crypt.AppIdentityError("Unrecognized client.")
+        if idinfo['iss'] not in ['accounts.google.com', 'https://accounts.google.com']:
+            raise crypt.AppIdentityError("Wrong issuer.")
+    except crypt.AppIdentityError:
+        raise crypt.AppIdentityError("Invalid token")
+    userid = idinfo['sub']
+#debug: printing out id token info
+#    print(idinfo)
+    if userid == '110738595623819373018':
+        session['logged_in_admin'] = True
+        flash("You are logged in as a Admin level user!")
+        print ("came this far!!!!!!")
+        return redirect(url_for('show_tblxxx_entries'))
+    else:
+        session['logged_in_guest'] = True
+        print ("In here!!")
+        flash("You are logged in as a Guest")
+    return redirect(url_for('show_tblxxx_entries'))
+
+@app.route('/login')
 def login():
-    permission_error = None
-    if request.method == 'POST':
-        if (request.form['username'] == app.config['USERNAME_USER_LEVEL'] and
-            request.form['password'] == app.config['PASSWORD_USER_LEVEL']):
-                session['logged_in_guest'] = True
-                global globvar_table_select
-                globvar_table_select = 'tbl1xx'
-                flash('You were logged in as a guest level user')
-                return redirect(url_for('show_tblxxx_entries'))
-        elif (request.form['username'] == app.config['USERNAME_ENGINEER_LEVEL'] and
-            request.form['password'] == app.config['PASSWORD_ENGINEER_LEVEL']):
-                session['logged_in_engineer'] = True
-                globvar_table_select = 'tbl1xx'
-                flash('You were logged in as an engineer level user')
-                return redirect(url_for('show_tblxxx_entries'))
-        elif (request.form['username'] == app.config['USERNAME_ADMIN_LEVEL'] and
-            request.form['password'] == app.config['PASSWORD_ADMIN_LEVEL']):
-                session['logged_in_admin'] = True
-                globvar_table_select = 'tbl1xx'
-                flash('You were logged in as an admin level user')
-                return redirect(url_for('show_tblxxx_entries'))
-        else:
-            permission_error = 'Invalid username or password'
-    return render_template('login.html', permission_error = permission_error)
+    return render_template('login.html')
+
 
 #If logout button is pressed then user session is popped and filled with none
 @app.route('/logout')

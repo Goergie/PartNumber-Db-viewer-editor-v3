@@ -27,6 +27,7 @@ USERNAME_ENGINEER_LEVEL = 'admin'
 PASSWORD_ENGINEER_LEVEL = 'adminjelszo'
 USERNAME_ADMIN_LEVEL = 'sadmin'
 PASSWORD_ADMIN_LEVEL = 'superadmin'
+ADMIN_EMAIL = 'apnvev@gmail.com'
 
 app = Flask(__name__)
 Bootstrap(app)
@@ -53,6 +54,10 @@ def teardown_request_fromdb(exception):
     if db is not None:
         db.close()
 
+@app.route('/login')
+def login():
+    return render_template('login.html')
+
 #Used to select table from database via dropdown form on html side
 @app.route('/table_select', methods=['POST'])
 def select_table():
@@ -67,9 +72,9 @@ def select_table():
 #View of tbl1xx as default
 @app.route('/')
 def show_tblxxx_entries():
-    # if (not session.get('logged_in_admin') and not session.get('logged_in_guest')):
-    #      print ("inside here")
-    #      return redirect(url_for('login'))
+    if (not session.get('logged_in_admin') and not session.get('logged_in_guest') and not session.get('logged_in_engineer')):
+          print ("inside here")
+          return redirect(url_for('login'))
     template_data = {}
     select_sql_query = "SELECT * FROM %s" % globvar_table_select
     #cursor_partnumber = g.db.execute('select grp || '-' || substr('00000'||pn,-5,5) || '-' || ver from tbl1xx as partnumber')
@@ -148,6 +153,7 @@ def mod_tblxxx_entry():
 
 @app.route('/verify', methods=['POST'])
 def verify():
+    app_valid_user = 0
     database_data= {}
     id_token_encoded = request.form['id']
     try:
@@ -160,49 +166,85 @@ def verify():
     except crypt.AppIdentityError:
         raise crypt.AppIdentityError("Invalid token")
     userid = idinfo['sub']
+    quoted_user = "'"+userid+"'"
 # accepting autherized users
     query_get_userid = "SELECT * FROM users"
     cursor = g.db.execute(query_get_userid)
     database_data["users+lvl"] = cursor.fetchall()
     database_data["users"] = list(map(lambda x: x[0], database_data["users+lvl"]))
     database_data["lvls"] = list(map(lambda x: x[1], database_data["users+lvl"]))
+    print("test",userid)
     for user in database_data["users"]:
-        if userid == user:
-            app_valid_user = 1
-            print("Logged in User:")
-            print(user)
-            break
+        print ("user:",user)
+        if user == userid:
+            query_check_lvl = "SELECT usr_lvl FROM users WHERE google_id = %s" %quoted_user
+            get_lvl = g.db.execute(query_check_lvl)
+            get_lvl = get_lvl.fetchall()
+            get_lvl = list(map(lambda x: x[0], get_lvl))
+            print(get_lvl)
+            if get_lvl != [None]:
+                app_valid_user = 2
+                print("Logged in User:",user)
+                break
+            else:
+                app_valid_user = 1
             #user is already in database
-        else:
-            app_valid_user = 0
-            #send email for admin to add user to database and set user level
-
-    quoted_user = "'"+userid+"'"
+    if app_valid_user == 0:
+        query_add_userid = "INSERT INTO users (google_id) VALUES (%s)" %quoted_user
+        g.db.execute(query_add_userid)
+        g.db.commit()
+        #userid added to database, but usr_lvl will be added by admin
     query_select_user_level = "SELECT usr_lvl FROM users WHERE google_id = %s" %quoted_user
     selected_users_access_lvl = g.db.execute(query_select_user_level)
-    selected_users_access_lvl
+    database_data["lvl"] = list(map(lambda x: x[0], selected_users_access_lvl))
+    if app_valid_user == 2:
+        if database_data["lvl"] == [2]:
+            session['logged_in_admin'] = True
+            flash("You are logged in as a Admin level user!")
+            return redirect(url_for('show_tblxxx_entries'))
+        elif database_data["lvl"] == [1]:
+            flash("You are logged in as a Engineer level user!")
+            session['logged_in_engineer'] = True
+            return redirect(url_for('show_tblxxx_entries'))
+        else:
+            session['logged_in_guest'] = True
+            flash("You are logged in as a Guest")
+            return redirect(url_for('show_tblxxx_entries'))
+    else:
+        print( "Request access!")
+        session['awaiting_access'] = True
+        return redirect(url_for('awaiting_access'))
+#    return redirect(url_for('show_tblxxx_entries'))
 
-    session['logged_in_guest'] = True
-    # if app_valid_user == 1:
-    #
-    #         if level == 2:
-    #             session['logged_in_admin'] = True
-    #             flash("You are logged in as a Admin level user!")
-    #             return redirect(url_for('show_tblxxx_entries'))
-    #         elif level == 1:
-    #             session['logged_in_engineer'] = True
-    #             flash("You are logged in as a Engineer level user!")
-    #             return redirect(url_for('show_tblxxx_entries'))
-    #         else:
-    #             session['logged_in_guest'] = True
-    #             flash("You are logged in as a Guest")
+#If user is not yet in the database. Email is sent to the admin for user level access
+@app.route('/awaiting_access')
+def awaiting_access():
+    session.pop('awaiting_access', None)
+    #send email for admin to add user to database and set user level
+    return render_template('awaiting_access.html')
+
+@app.route('/add_user_page')
+def add_user_page():
+    if not session.get('logged_in_admin'):
+        return redirect(url_for('show_tblxxx_entries'))
+    database_data = {}
+    query_get_userid = "SELECT google_id FROM users"
+    cursor = g.db.execute(query_get_userid)
+    database_data["users_tmp"] = cursor.fetchall()
+    database_data["users"] = list(map(lambda x: x[0], database_data["users_tmp"]))
+    return render_template('add_user.html', **database_data)
+
+@app.route('/add_user',methods=['POST'])
+def add_user():
+    user_id = "'"+request.form['user_id']+"'"
+    print(user_id)
+    user_lvl = int(request.form['adduser'])
+    print("value:",user_lvl)
+    query_add_user = "UPDATE users SET usr_lvl = ? WHERE google_id = ?"
+    g.db.execute(query_add_user, [user_lvl, user_id])
+    g.db.commit()
+    flash('User rights level successfully changed')
     return redirect(url_for('show_tblxxx_entries'))
-
-
-@app.route('/login')
-def login():
-    return render_template('login.html')
-
 
 #If logout button is pressed then user session is popped and filled with none
 @app.route('/logout')

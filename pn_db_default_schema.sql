@@ -4,6 +4,7 @@ drop table if exists tbl3xx;
 drop table if exists tbl4xx;
 drop table if exists tbl5xx;
 drop table if exists tbl6xx;
+drop table if exists users;
 
 -- *************************
 -- *      Table setup      *
@@ -107,6 +108,15 @@ create table tbl6xx (
   datasheet text check( length(datasheet) <=30) default 'n/a'
 );
 
+-- *************************
+-- *     Table Setup       *
+-- *        Users          *
+-- *************************
+
+CREATE TABLE users (
+    google_id varchar(21) check( length(google_id) = 21) not null,
+    usr_lvl int check( usr_lvl in ( 0, 1, 2 )) not null
+);
 -- *************************
 -- *       Demo Data       *
 -- *       Resistor        *

@@ -114,8 +114,8 @@ create table tbl6xx (
 -- *************************
 
 CREATE TABLE users (
-    google_id varchar(21) check( length(google_id) = 21) not null,
-    usr_lvl int check( usr_lvl in ( 0, 1, 2 )) not null
+    google_id varchar(21) check( length(google_id) = 21) primary key,
+    usr_lvl int check( usr_lvl in ( 0, 1, 2 ))
 );
 -- *************************
 -- *       Demo Data       *

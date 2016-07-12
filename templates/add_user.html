@@ -1,0 +1,27 @@
+{% extends "layout.html" %}
+{% block body %}
+    <h3 class="text-center"><strong>Admin Page</strong></h3>
+    <br><br><br>
+    <form action="{{ url_for('add_user') }}" method="post" class="form-inline" role="select user">
+        <div class="form-group dropdown">
+            <label for="user_id">Select User:&nbsp;</label>
+            <select class="form-control text-center" name="user_id">
+                {% for usr in users %}
+                        <option name="user_id" value="{{usr}}">{{usr}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <br><br>
+        <div class="form-group dropdown">
+            <label for="add_user">User level: &nbsp;&nbsp;&nbsp;</label>
+            <select class="form-control text-center" name="adduser">
+                <option value="0">Guest</option>
+                <option value="1">Engineer</option>
+                <option value="2">Admin</option>
+            </select>
+        </div>
+        <div class="form-group pull-right">
+            <input type="submit" class="btn btn-success" value="Add"> &nbsp;&nbsp;
+        </div>
+    </form>
+{% endblock %}

@@ -53,7 +53,7 @@ def teardown_request_fromdb(exception):
     if db is not None:
         db.close()
 
-#Used to select table from database via dropdown form on html side (no SQL Injection)
+#Used to select table from database via dropdown form on html side
 @app.route('/table_select', methods=['POST'])
 def select_table():
     table_data = {}
@@ -67,9 +67,9 @@ def select_table():
 #View of tbl1xx as default
 @app.route('/')
 def show_tblxxx_entries():
-    if (not session.get('logged_in_admin') and not session.get('logged_in_guest')):
-         print ("inside here")
-         return redirect(url_for('login'))
+    # if (not session.get('logged_in_admin') and not session.get('logged_in_guest')):
+    #      print ("inside here")
+    #      return redirect(url_for('login'))
     template_data = {}
     select_sql_query = "SELECT * FROM %s" % globvar_table_select
     #cursor_partnumber = g.db.execute('select grp || '-' || substr('00000'||pn,-5,5) || '-' || ver from tbl1xx as partnumber')
@@ -148,6 +148,7 @@ def mod_tblxxx_entry():
 
 @app.route('/verify', methods=['POST'])
 def verify():
+    database_data= {}
     id_token_encoded = request.form['id']
     try:
         idinfo = client.verify_id_token(id_token_encoded,"697582317644-j2hlr3cmofm19cjibkm3ka0o5k9uf5ek.apps.googleusercontent.com")
@@ -159,18 +160,44 @@ def verify():
     except crypt.AppIdentityError:
         raise crypt.AppIdentityError("Invalid token")
     userid = idinfo['sub']
-#debug: printing out id token info
-#    print(idinfo)
-    if userid == '110738595623819373018':
-        session['logged_in_admin'] = True
-        flash("You are logged in as a Admin level user!")
-        print ("came this far!!!!!!")
-        return redirect(url_for('show_tblxxx_entries'))
-    else:
-        session['logged_in_guest'] = True
-        print ("In here!!")
-        flash("You are logged in as a Guest")
+# accepting autherized users
+    query_get_userid = "SELECT * FROM users"
+    cursor = g.db.execute(query_get_userid)
+    database_data["users+lvl"] = cursor.fetchall()
+    database_data["users"] = list(map(lambda x: x[0], database_data["users+lvl"]))
+    database_data["lvls"] = list(map(lambda x: x[1], database_data["users+lvl"]))
+    for user in database_data["users"]:
+        if userid == user:
+            app_valid_user = 1
+            print("Logged in User:")
+            print(user)
+            break
+            #user is already in database
+        else:
+            app_valid_user = 0
+            #send email for admin to add user to database and set user level
+
+    quoted_user = "'"+userid+"'"
+    query_select_user_level = "SELECT usr_lvl FROM users WHERE google_id = %s" %quoted_user
+    selected_users_access_lvl = g.db.execute(query_select_user_level)
+    selected_users_access_lvl
+
+    session['logged_in_guest'] = True
+    # if app_valid_user == 1:
+    #
+    #         if level == 2:
+    #             session['logged_in_admin'] = True
+    #             flash("You are logged in as a Admin level user!")
+    #             return redirect(url_for('show_tblxxx_entries'))
+    #         elif level == 1:
+    #             session['logged_in_engineer'] = True
+    #             flash("You are logged in as a Engineer level user!")
+    #             return redirect(url_for('show_tblxxx_entries'))
+    #         else:
+    #             session['logged_in_guest'] = True
+    #             flash("You are logged in as a Guest")
     return redirect(url_for('show_tblxxx_entries'))
+
 
 @app.route('/login')
 def login():
@@ -185,6 +212,5 @@ def logout():
     session.pop('logged_in_admin', None)
     flash('You were logged out')
     return redirect(url_for('login'))
-
 if __name__ == '__main__':
     app.run()

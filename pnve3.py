@@ -73,7 +73,6 @@ def select_table():
 @app.route('/')
 def show_tblxxx_entries():
     if (not session.get('logged_in_admin') and not session.get('logged_in_guest') and not session.get('logged_in_engineer')):
-          print ("inside here")
           return redirect(url_for('login'))
     template_data = {}
     select_sql_query = "SELECT * FROM %s" % globvar_table_select
@@ -181,10 +180,8 @@ def verify():
             get_lvl = g.db.execute(query_check_lvl)
             get_lvl = get_lvl.fetchall()
             get_lvl = list(map(lambda x: x[0], get_lvl))
-            print(get_lvl)
             if get_lvl != [None]:
                 app_valid_user = 2
-                print("Logged in User:",user)
                 break
             else:
                 app_valid_user = 1
@@ -214,7 +211,6 @@ def verify():
         print( "Request access!")
         session['awaiting_access'] = True
         return redirect(url_for('awaiting_access'))
-#    return redirect(url_for('show_tblxxx_entries'))
 
 #If user is not yet in the database. Email is sent to the admin for user level access
 @app.route('/awaiting_access')
@@ -230,28 +226,40 @@ def add_user_page():
     database_data = {}
     query_get_userid = "SELECT google_id FROM users"
     cursor = g.db.execute(query_get_userid)
-    database_data["users_tmp"] = cursor.fetchall()
-    database_data["users"] = list(map(lambda x: x[0], database_data["users_tmp"]))
+    database_data["users"] = cursor.fetchall()
+    database_data["users"] = list(map(lambda x: x[0], database_data["users"]))
     return render_template('add_user.html', **database_data)
 
 @app.route('/add_user',methods=['POST'])
 def add_user():
-    user_id = "'"+request.form['user_id']+"'"
-    print(user_id)
-    user_lvl = int(request.form['adduser'])
-    print("value:",user_lvl)
+#Check number of admin users before change
+    database_data = {}
+    query_check_num_admin = "SELECT  google_id FROM users WHERE usr_lvl = 2"
+    cursor = g.db.execute(query_check_num_admin)
+    database_data["num_admin"] = cursor.fetchall()
+    admin_count = len(database_data["num_admin"])
+    listed_user = "['"+request.form['user_id']+"']"
+# Dont allow change if only 1 admin user and change from admin to other
+    if admin_count == 1:
+        database_data["admin"] = list(map(lambda x: x[0], database_data["num_admin"]))
+        admin = str(database_data["admin"])
+        if listed_user == admin:
+            flash('User cannot change his own permission level')
+            return redirect(url_for('add_user_page'))
+# Dont allow user to change his own user level
+    #if request.form['user_id'] == logged_in_user
     query_add_user = "UPDATE users SET usr_lvl = ? WHERE google_id = ?"
-    g.db.execute(query_add_user, [user_lvl, user_id])
+    g.db.execute(query_add_user, [request.form['adduser'], request.form['user_id']])
     g.db.commit()
     flash('User rights level successfully changed')
     return redirect(url_for('show_tblxxx_entries'))
 
-#If logout button is pressed then user session is popped and filled with none
 @app.route('/logout')
 def logout():
     session.pop('logged_in_guest', None)
     session.pop('logged_in_engineer', None)
     session.pop('logged_in_admin', None)
+    session.pop('awaiting_access', None)
     flash('You were logged out')
     return redirect(url_for('login'))
 if __name__ == '__main__':

@@ -115,7 +115,9 @@ create table tbl6xx (
 
 CREATE TABLE users (
     google_id varchar(21) check( length(google_id) = 21) primary key,
-    usr_lvl int check( usr_lvl in ( 0, 1, 2 ))
+    usr_lvl int check( usr_lvl in ( 0, 1, 2 )),
+    usr_email varchar(74) check( length(usr_email) <=74),
+    sent_auth_req_email varchar(3)
 );
 -- *************************
 -- *       Demo Data       *
@@ -132,6 +134,23 @@ INSERT INTO tbl1xx (grp, value, param, desc, status, rohs, datasheet) VALUES
 (110,'100','1%','1/4','deleted','no','asd');
 INSERT INTO tbl1xx (grp, value, param, desc, status, rohs, datasheet) VALUES
 (111,'1k','.1%','1/5','active','yes','www.hestore.com');
+-- For spam fill
+-- INSERT INTO tbl1xx (grp, value, param, desc, status, rohs, datasheet) VALUES
+-- (101,'100','5%','1/16','active','yes','www.google.com');
+-- INSERT INTO tbl1xx (grp, value, param, desc, status, rohs, datasheet) VALUES
+-- (101,'100','5%','1/16','active','yes','www.google.com');
+-- INSERT INTO tbl1xx (grp, value, param, desc, status, rohs, datasheet) VALUES
+-- (101,'100','5%','1/16','active','yes','www.google.com');
+-- INSERT INTO tbl1xx (grp, value, param, desc, status, rohs, datasheet) VALUES
+-- (101,'100','5%','1/16','active','yes','www.google.com');
+-- INSERT INTO tbl1xx (grp, value, param, desc, status, rohs, datasheet) VALUES
+-- (101,'100','5%','1/16','active','yes','www.google.com');
+-- INSERT INTO tbl1xx (grp, value, param, desc, status, rohs, datasheet) VALUES
+-- (101,'100','5%','1/16','active','yes','www.google.com');
+-- INSERT INTO tbl1xx (grp, value, param, desc, status, rohs, datasheet) VALUES
+-- (101,'100','5%','1/16','active','yes','www.google.com');
+-- INSERT INTO tbl1xx (grp, value, param, desc, status, rohs, datasheet) VALUES
+-- (101,'100','5%','1/16','active','yes','www.google.com');
 
 -- *************************
 -- *       Demo Data       *

@@ -5,15 +5,25 @@ import json
 import httplib2
 import base64
 import jwt
+import mimetypes
+import oauth2client
+import smtplib
 
 from flask_bootstrap import Bootstrap
 from flask import Flask, request, session, g, redirect, url_for, \
     abort, render_template, flash, jsonify
-
+from email.mime.base import MIMEBase
+from email.mime.text import MIMEText
+from email import encoders
 from contextlib import closing
+from oauth2client import client, crypt, tools
+from apiclient import errors, discovery
 
-from oauth2client import client, crypt
-from apiclient.discovery import build
+# try:
+#     import argparse
+#     flags = argparse.ArgumentParser(parents=[tools.argparser]).parse_args()
+# except ImportError:
+#     flags = None
 
 # configuration
 cwd = os.getcwd()
@@ -21,19 +31,18 @@ rel_path = os.path.join(cwd, 'tmp/pnve3.db')
 DATABASE_PATH = rel_path
 DEBUG = True
 SECRET_KEY = 'dev_key'
-USERNAME_USER_LEVEL = 'guest'
-PASSWORD_USER_LEVEL = 'userjelszo'
-USERNAME_ENGINEER_LEVEL = 'admin'
-PASSWORD_ENGINEER_LEVEL = 'adminjelszo'
-USERNAME_ADMIN_LEVEL = 'sadmin'
-PASSWORD_ADMIN_LEVEL = 'superadmin'
-ADMIN_EMAIL = 'apnvev@gmail.com'
+MAIL_USERNAME = 'barnav12@gmail.com'
+MAIL_PASS = 'nnpvhcjnuyqyyvlz'
+SCOPES = 'https://www.googleapis.com/auth/gmail.send'
+CLIENT_SECRET_FILE = 'client_secret.json'
+APP_NAME = 'PNVE_v3'
 
 app = Flask(__name__)
 Bootstrap(app)
 app.config.from_object(__name__)
 
 globvar_table_select = 'tbl1xx'
+globvar_cur_user_email = ''
 
 def connect_db():
     return sqlite3.connect(app.config['DATABASE_PATH'])
@@ -150,9 +159,10 @@ def mod_tblxxx_entry():
     flash('New entry was successfully modified')
     return redirect(url_for('show_tblxxx_entries'))
 
+#Check if login is valid google acc and if user has access to app
 @app.route('/verify', methods=['POST'])
 def verify():
-    app_valid_user = 0
+    app_valid_user = "not in db"
     database_data= {}
     id_token_encoded = request.form['id']
     try:
@@ -165,36 +175,50 @@ def verify():
     except crypt.AppIdentityError:
         raise crypt.AppIdentityError("Invalid token")
     userid = idinfo['sub']
+    user_email = idinfo['email']
+    check_token = idinfo['email_verified']
+# check if user has valid google email (check google responce)
+    if check_token != True:
+        flash('Invalid Email!')
+        return redirect(url_for('login'))
+    global globvar_cur_user_email
+    globvar_cur_user_email = user_email
     quoted_user = "'"+userid+"'"
+    quoted_email = "'"+user_email+"'"
 # accepting autherized users
     query_get_userid = "SELECT * FROM users"
     cursor = g.db.execute(query_get_userid)
-    database_data["users+lvl"] = cursor.fetchall()
-    database_data["users"] = list(map(lambda x: x[0], database_data["users+lvl"]))
-    database_data["lvls"] = list(map(lambda x: x[1], database_data["users+lvl"]))
-    print("test",userid)
+    database_data["users+lvl+email+req"] = cursor.fetchall()
+    database_data["users"] = list(map(lambda x: x[0], database_data["users+lvl+email+req"]))
+    database_data["lvls"] = list(map(lambda x: x[1], database_data["users+lvl+email+req"]))
+    database_data["email"] = list(map(lambda x: x[2], database_data["users+lvl+email+req"]))
+    database_data["req"] = list(map(lambda x: x[3], database_data["users+lvl+email+req"]))
+    print(database_data["req"])
     for user in database_data["users"]:
-        print ("user:",user)
         if user == userid:
             query_check_lvl = "SELECT usr_lvl FROM users WHERE google_id = %s" %quoted_user
             get_lvl = g.db.execute(query_check_lvl)
             get_lvl = get_lvl.fetchall()
             get_lvl = list(map(lambda x: x[0], get_lvl))
             if get_lvl != [None]:
-                app_valid_user = 2
+# User in database and has permission level set
+                app_valid_user = "Has Permission"
                 break
             else:
-                app_valid_user = 1
-            #user is already in database
-    if app_valid_user == 0:
-        query_add_userid = "INSERT INTO users (google_id) VALUES (%s)" %quoted_user
-        g.db.execute(query_add_userid)
-        g.db.commit()
-        #userid added to database, but usr_lvl will be added by admin
+# User is already in database but has no permission
+                app_valid_user = "Permission not set"
+# If user not in database (no google_id)
+    if app_valid_user == "not in db":
+        query_add_userinfo = "INSERT INTO users (google_id,usr_email,sent_auth_req_email) VALUES (%s,%s,'No')" \
+            %(quoted_user,quoted_email)
+        g.db.execute(query_add_userinfo)
+        g.db.commit() #userid added to database, but usr_lvl will be added by admin via add_user.html
+# Check permission level of user
     query_select_user_level = "SELECT usr_lvl FROM users WHERE google_id = %s" %quoted_user
     selected_users_access_lvl = g.db.execute(query_select_user_level)
     database_data["lvl"] = list(map(lambda x: x[0], selected_users_access_lvl))
-    if app_valid_user == 2:
+# If user has usr_lvl in database
+    if app_valid_user == "Has Permission":
         if database_data["lvl"] == [2]:
             session['logged_in_admin'] = True
             flash("You are logged in as a Admin level user!")
@@ -207,38 +231,91 @@ def verify():
             session['logged_in_guest'] = True
             flash("You are logged in as a Guest")
             return redirect(url_for('show_tblxxx_entries'))
+# If usr_lvl is null in database
     else:
         print( "Request access!")
         session['awaiting_access'] = True
         return redirect(url_for('awaiting_access'))
 
+#Send email
+def send_message(to, subject, text):
+    """Args:
+            to: Email address of receiver
+            subject: subject of the email
+            text: body of email
+    """
+    message = MIMEText(text)
+    message['to'] = to
+    message['from'] = MAIL_USERNAME
+    message['subject'] = subject
+
+    print("TEXT:")
+    print(message)
+
+    mailServer = smtplib.SMTP("smtp.gmail.com", 587)
+    mailServer.ehlo()
+    mailServer.starttls()
+    mailServer.ehlo()
+    mailServer.login(MAIL_USERNAME, MAIL_PASS)
+    mailServer.sendmail(MAIL_USERNAME, MAIL_USERNAME, message.as_string())
+    mailServer.close()
+
 #If user is not yet in the database. Email is sent to the admin for user level access
 @app.route('/awaiting_access')
 def awaiting_access():
-    session.pop('awaiting_access', None)
-    #send email for admin to add user to database and set user level
-    return render_template('awaiting_access.html')
+    #check if email has already been sent
+    sent_mail = ''
+    query_check_mail_sent = 'SELECT sent_auth_req_email FROM users WHERE usr_email = \'%s\'' %globvar_cur_user_email
+    cursor = g.db.execute(query_check_mail_sent)
+    g.db.commit()
+    sent_mail = cursor.fetchall()
+    sent_mail = list(map(lambda x: x[0], sent_mail))
+    #Check if email was already sent or not. If yes dont send again
+    if sent_mail == ['No']:
+        print("No:In Here")
+        #message to send
+        msg = "New user "+globvar_cur_user_email+" has asked for access"
+        #send email for admin to add user to database and set user level via SMTP
+        send_message(MAIL_USERNAME,'New user access',msg)
+        #change sent_auth_req_email to yes in db
+        query_change_email_stat = 'UPDATE users SET sent_auth_req_email=\'Yes\' WHERE usr_email=\'%s\'' %globvar_cur_user_email
+        print("CHANGE STAT:",query_change_email_stat)
+        g.db.execute(query_change_email_stat)
+        g.db.commit()
+        return render_template('awaiting_access.html')
+    else:
+        print("YES: In Here")
+        return render_template('awaiting_access.html')
 
+#Backend for displaying user in database and access levels
 @app.route('/add_user_page')
 def add_user_page():
     if not session.get('logged_in_admin'):
         return redirect(url_for('show_tblxxx_entries'))
     database_data = {}
-    query_get_userid = "SELECT google_id FROM users"
-    cursor = g.db.execute(query_get_userid)
-    database_data["users"] = cursor.fetchall()
-    database_data["users"] = list(map(lambda x: x[0], database_data["users"]))
+    query_get_email = "SELECT usr_email FROM users"
+    query_select_app_users = 'SELECT usr_email, usr_lvl FROM users WHERE usr_lvl != \'NULL\''
+    cursor = g.db.execute(query_get_email)
+    database_data['users'] = cursor.fetchall()
+    database_data['users'] = list(map(lambda x: x[0], database_data["users"]))
+    cursor2 = g.db.execute(query_select_app_users)
+    database_data['app_users'] = cursor2.fetchall()
+    database_data['cols'] = list(map(lambda x: x[0], cursor2.description))
+    print(database_data['app_users'])
+    print(database_data['cols'])
     return render_template('add_user.html', **database_data)
 
 @app.route('/add_user',methods=['POST'])
 def add_user():
 #Check number of admin users before change
     database_data = {}
-    query_check_num_admin = "SELECT  google_id FROM users WHERE usr_lvl = 2"
+    query_check_num_admin = "SELECT google_id FROM users WHERE usr_lvl = 2"
     cursor = g.db.execute(query_check_num_admin)
     database_data["num_admin"] = cursor.fetchall()
     admin_count = len(database_data["num_admin"])
-    listed_user = "['"+request.form['user_id']+"']"
+    listed_user = "['"+request.form['email']+"']"
+    print("Current user: ",globvar_cur_user_email)
+    print("request email:",request.form['email'])
 # Dont allow change if only 1 admin user and change from admin to other
     if admin_count == 1:
         database_data["admin"] = list(map(lambda x: x[0], database_data["num_admin"]))
@@ -247,12 +324,14 @@ def add_user():
             flash('User cannot change his own permission level')
             return redirect(url_for('add_user_page'))
 # Dont allow user to change his own user level
-    #if request.form['user_id'] == logged_in_user
-    query_add_user = "UPDATE users SET usr_lvl = ? WHERE google_id = ?"
-    g.db.execute(query_add_user, [request.form['adduser'], request.form['user_id']])
+    if request.form['email'] == globvar_cur_user_email:
+        flash('User cannot change his own permission level')
+        return redirect(url_for('add_user_page'))
+    query_add_user = "UPDATE users SET usr_lvl = ? WHERE usr_email = ?"
+    g.db.execute(query_add_user, [request.form['adduser'], request.form['email']])
     g.db.commit()
     flash('User rights level successfully changed')
-    return redirect(url_for('show_tblxxx_entries'))
+    return redirect(url_for('add_user_page'))
 
 @app.route('/logout')
 def logout():
@@ -262,5 +341,6 @@ def logout():
     session.pop('awaiting_access', None)
     flash('You were logged out')
     return redirect(url_for('login'))
+
 if __name__ == '__main__':
     app.run()

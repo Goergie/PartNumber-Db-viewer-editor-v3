@@ -4,16 +4,16 @@
     <br><br><br>
     <form action="{{ url_for('add_user') }}" method="post" class="form-inline" role="select user">
         <div class="form-group dropdown">
-            <label for="user_id">Select User:&nbsp;</label>
-            <select class="form-control text-center" name="user_id">
+            <label for="email">Select User:&nbsp;</label>
+            <select class="form-control text-center" name="email">
                 {% for usr in users %}
-                        <option value="{{usr}}">{{usr}}</option>
+                        <option name="email" value="{{usr}}">{{usr}}</option>
                 {% endfor %}
             </select>
         </div>
         <br><br>
         <div class="form-group dropdown">
-            <label for="add_user">User level: &nbsp;&nbsp;&nbsp;</label>
+            <label for="adduser">User level: &nbsp;&nbsp;&nbsp;</label>
             <select class="form-control text-center" name="adduser">
                 <option value="0">Guest</option>
                 <option value="1">Engineer</option>
@@ -24,4 +24,41 @@
             <input type="submit" class="btn btn-success" value="Add"> &nbsp;&nbsp;
         </div>
     </form>
+    <br><br><br>
+    <div style="overflow-x:auto">
+        <table class="table-hover">
+            <tr>
+                <thead>
+                    {% for col in cols %}
+                        {% if col == 'usr_email' %}
+                            <th>Email</th>
+                        {% endif %}
+                        {% if col == 'usr_lvl' %}
+                            <th>Access Level</th>
+                        {% endif %}
+                    {% endfor %}
+                </thead>
+            </tr>
+            {% set cols_num = cols | length %}
+            {% for row in app_users %}
+            <tr>
+                {% for i in range(cols_num) %}
+                    {% if i == 1 %}
+                        {% if row[1] == 0 %}
+                            <td>Guest</td>
+                        {% elif row[1] == 1 %}
+                            <td>Engineer</td>
+                        {% elif row[1] == 2 %}
+                            <td><strong>Admin</strong></td>
+                        {%else %}
+                            <td>{{ row[i] }}</td>
+                        {% endif %}
+                    {% else %}
+                            <td>{{ row[i] }}</td>
+                    {% endif %}
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+    </div>
 {% endblock %}

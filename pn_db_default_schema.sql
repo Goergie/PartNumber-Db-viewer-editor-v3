@@ -5,6 +5,9 @@ drop table if exists tbl4xx;
 drop table if exists tbl5xx;
 drop table if exists tbl6xx;
 drop table if exists users;
+drop table if exists logged_in_0;
+drop table if exists logged_in_1;
+drop table if exists logged_in_2;
 
 -- *************************
 -- *      Table setup      *
@@ -119,6 +122,18 @@ CREATE TABLE users (
     usr_email varchar(74) check( length(usr_email) <=74),
     sent_auth_req_email varchar(3)
 );
+
+-- *************************
+-- *     Table Setup       *
+-- *   Logged in Users     *
+-- *************************
+--Guest
+CREATE TABLE logged_in_0 (email text not null);
+--Engineer
+CREATE TABLE logged_in_1 (email text not null);
+--Admin
+CREATE TABLE logged_in_2 (email text not null);
+
 -- *************************
 -- *       Demo Data       *
 -- *       Resistor        *
@@ -189,3 +204,10 @@ INSERT INTO tbl4xx (grp, value, param, desc, status, rohs, datasheet) VALUES
 (402,'1k','55%','1/6','inactive','no','asd');
 INSERT INTO tbl4xx (grp, value, param, desc, status, rohs, datasheet) VALUES
 (403,'10k','1%','1/6','n/a','n/a','www.ddr.com');
+
+-- *************************
+-- *       Add Admin       *
+-- *************************
+
+INSERT INTO users (google_id,usr_lvl,usr_email,sent_auth_req_email) VALUES
+('110738595623819373018',2,'barnav12@gmail.com','Yes');

@@ -37,8 +37,6 @@
     <div class="form-group">
       <input type="submit" class="btn btn-success" name="pn" value="Modify">
     </div>
-  </input>
-
 </form>
 <br>
 <a href="{{ url_for('show_tblxxx_entries') }}" data-toggle="tooltip" title="Back">
@@ -46,4 +44,15 @@
         <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> Back
     </button>
 </a>
+{% endblock %}
+{% block script %}
+<script>
+//idle check function
+$(document).idle({
+    onIdle: function(){
+        signOut();
+    },
+    idle: 3600000
+})
+</script>
 {% endblock %}

@@ -78,8 +78,8 @@
                 <p><strong><em>No entries here so far</em></strong></p>
             <hr>
     {% else %}
-            <tr>
-                <thead>
+            <thead>
+                <tr>
                 {% for col in cols %}
                     <th>{{col}}</th>
                 {% endfor %}
@@ -90,49 +90,50 @@
                     <th width="50px">Del</th>
                     <th width="120px">Select<input type="checkbox" class="check pull-right" id="checkAll" data-toggle="tooltip" title="Select All"></th>
                 {% endif %}
+                </tr>
             </thead>
-            </tr>
     {% endif %}
 {% set cols_num = cols | length %}
             <form action="del_multiple_tblxxx_entry" id="multiple_delete" method="POST" class="pull-right" role="multiple_delete">
         {% for row in rows %}
-            <tr>
-                {% for i in range(cols_num) %}
-                <td>{{ row[i] }}</td>
-                    {% if i == 1 %}
-                        {% set pn = row[i] %}
-                    {% endif %}
-                    {% if not session.get('logged_in_guest') %}
-                        {% if i == (cols_num - 1) %}
-                            {% if session.get('logged_in_admin') %}
-                <td><a href="{{ url_for('mod_tblxxx_entry_page',pk=pn) }}" data-toggle="tooltip" title="Edit Record">
-                    <button type="button" class="btn btn-link" aria-label="mod">
-                        <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
-                    </button>
-                </td>
-                            {% endif %}
-                <td>
-                    <button onclick="deleteOneEntry({{pn}})" data-toggle="tooltip" title="Delete Record" type="submit" class="btn btn-link" aria-label="delete">
-                        <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-                    </button>
-                </td>
-                <td>
-                    <input class="check" id="mul_check" type="checkbox" name="multiple_del[]" value="{{pn}}">
-                </td>
-            </tr>
-                        {% endif %} {# if i == (cols_num - 1) #}
-                    {% endif %} {# if not session.get('logged_in_guest') #}
-                {% endfor %} {# for i in range(cols_num) #}
+                <tr>
+                    {% for i in range(cols_num) %}
+                    <td>{{ row[i] }}</td>
+                        {% if i == 1 %}
+                            {% set pn = row[i] %}
+                        {% endif %}
+                        {% if not session.get('logged_in_guest') %}
+                            {% if i == (cols_num - 1) %}
+                                {% if session.get('logged_in_admin') %}
+                    <td><a href="{{ url_for('mod_tblxxx_entry_page',pk=pn) }}" data-toggle="tooltip" title="Edit Record">
+                        <button type="button" class="btn btn-link" aria-label="mod">
+                            <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+                        </button>
+                    </td>
+                                {% endif %}
+                    <td>
+                        <button onclick="deleteOneEntry({{pn}})" data-toggle="tooltip" title="Delete Record" type="submit" class="btn btn-link" aria-label="delete">
+                            <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                        </button>
+                    </td>
+                    <td>
+                        <input class="check" id="mul_check" type="checkbox" name="multiple_del[]" value="{{pn}}">
+                    </td>
+                </tr>
+                            {% endif %} {# if i == (cols_num - 1) #}
+                        {% endif %} {# if not session.get('logged_in_guest') #}
+                    {% endfor %} {# for i in range(cols_num) #}
         {% endfor %}
             </form>
         </table>
-	</div>
+    </div>
 {# <!--Add script location--> #}
 {# <!--Script for checking all checkboxs--> #}
 {% endblock %}
 {% block script %}
     <script>
         var checkedValues = [];
+        //function to check all checkboxes in select row of table if select all box is pressed
         $("#checkAll").click(function() {
             checkedValues = [];
             $(".check").prop('checked', $(this).prop('checked'));
@@ -165,5 +166,12 @@
             });
         }
         $("#mul_del").on('click', submitMultiDel);
+        //idle check function
+        $(document).idle({
+            onIdle: function(){
+                signOut();
+            },
+            idle: 5000
+        })
     </script>
 {% endblock %}

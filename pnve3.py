@@ -159,6 +159,61 @@ def mod_tblxxx_entry():
     flash('New entry was successfully modified')
     return redirect(url_for('show_tblxxx_entries'))
 
+#Check if user is already logged into app elsewhere
+def check_user_logged_in(usr_email,usr_access):
+    """Args:
+            user_email: The current user logging into app
+            usr_access: Permission level of current user
+        Return 1: if user is logged in elsewhere
+                0: if user is not logged in elsewhere
+    """
+    users = {}
+    if usr_access == [0]:
+        print("USER ACCESS 0")
+        query_check_logged_users = "SELECT email FROM logged_in_0"
+        cursor = g.db.execute(query_check_logged_users)
+        users['logged'] = cursor.fetchall()
+        users['logged'] = list(map(lambda x: x[0],users['logged']))
+        print(users['logged'])
+        for user in users['logged']:
+            if user == usr_email:
+                return 1
+        return 0
+    elif usr_access == [1]:
+        print("USER ACCESS 1")
+        query_check_logged_users = "SELECT email FROM logged_in_1"
+        cursor = g.db.execute(query_check_logged_users)
+        users['logged'] = cursor.fetchall()
+        users['logged'] = list(map(lambda x: x[0],users['logged']))
+        print(users['logged'])
+        for user in users['logged']:
+            if user == usr_email:
+                return 1
+        return 0
+    elif usr_access == [2]:
+        print("USER ACCESS 2")
+        query_check_logged_users = "SELECT email FROM logged_in_2"
+        cursor = g.db.execute(query_check_logged_users)
+        users['logged'] = cursor.fetchall()
+        users['logged'] = list(map(lambda x: x[0],users['logged']))
+        for user in users['logged']:
+            if user == usr_email:
+                return 1
+        return 0
+
+#Adds user to table of permission level in db
+def add_logged_in2db(usr_email,usr_access):
+        """Args:
+                user_email: The current user logging into app
+                usr_access: Permission level of current user
+        """
+        db = "logged_in_%s" %usr_access
+        print("db:", db)
+        query_add_user_loggedin = "INSERT INTO %s VALUES (\'%s\')" %(db,usr_email)
+        g.db.execute(query_add_user_loggedin)
+        g.db.commit()
+        return "Added to database %s" %db
+
 #Check if login is valid google acc and if user has access to app
 @app.route('/verify', methods=['POST'])
 def verify():
@@ -193,7 +248,6 @@ def verify():
     database_data["lvls"] = list(map(lambda x: x[1], database_data["users+lvl+email+req"]))
     database_data["email"] = list(map(lambda x: x[2], database_data["users+lvl+email+req"]))
     database_data["req"] = list(map(lambda x: x[3], database_data["users+lvl+email+req"]))
-    print(database_data["req"])
     for user in database_data["users"]:
         if user == userid:
             query_check_lvl = "SELECT usr_lvl FROM users WHERE google_id = %s" %quoted_user
@@ -219,18 +273,25 @@ def verify():
     database_data["lvl"] = list(map(lambda x: x[0], selected_users_access_lvl))
 # If user has usr_lvl in database
     if app_valid_user == "Has Permission":
+        #if check_user_logged_in(user_email,database_data["lvl"]) == 0:
         if database_data["lvl"] == [2]:
             session['logged_in_admin'] = True
             flash("You are logged in as a Admin level user!")
+            #add_logged_in2db(user_email,2)
             return redirect(url_for('show_tblxxx_entries'))
         elif database_data["lvl"] == [1]:
             flash("You are logged in as a Engineer level user!")
             session['logged_in_engineer'] = True
+            #add_logged_in2db(user_email,1)
             return redirect(url_for('show_tblxxx_entries'))
         else:
             session['logged_in_guest'] = True
             flash("You are logged in as a Guest")
+            #add_logged_in2db(user_email,0)
             return redirect(url_for('show_tblxxx_entries'))
+        # else:
+        #     flash('You are already logged in')
+        #     return render_template('loggedin.html')
 # If usr_lvl is null in database
     else:
         print( "Request access!")
@@ -251,7 +312,7 @@ def send_message(to, subject, text):
 
     print("TEXT:")
     print(message)
-
+#Setuo SMTP server
     mailServer = smtplib.SMTP("smtp.gmail.com", 587)
     mailServer.ehlo()
     mailServer.starttls()
@@ -264,7 +325,6 @@ def send_message(to, subject, text):
 @app.route('/awaiting_access')
 def awaiting_access():
     #check if email has already been sent
-    sent_mail = ''
     query_check_mail_sent = 'SELECT sent_auth_req_email FROM users WHERE usr_email = \'%s\'' %globvar_cur_user_email
     cursor = g.db.execute(query_check_mail_sent)
     g.db.commit()
@@ -279,7 +339,6 @@ def awaiting_access():
         send_message(MAIL_USERNAME,'New user access',msg)
         #change sent_auth_req_email to yes in db
         query_change_email_stat = 'UPDATE users SET sent_auth_req_email=\'Yes\' WHERE usr_email=\'%s\'' %globvar_cur_user_email
-        print("CHANGE STAT:",query_change_email_stat)
         g.db.execute(query_change_email_stat)
         g.db.commit()
         return render_template('awaiting_access.html')

@@ -1,4 +1,4 @@
-{% extends "layout.html"%}
+{% extends "layout.html" %}
 {% block body %}
     <div class="jumbotron">
         <h1 class="text-center"><strong>Partnumber Database Viewer-Editor v3</strong></h1>
@@ -11,7 +11,8 @@
             {% for col in cols %}
                 {% if col != 'status' and col != 'rohs' and col !='pn' %}
                     <div class="form-group">
-                        &nbsp; <label for="{{col}}">{{col}}: &nbsp; </label><input type="text" size="10" name="{{col}}" id="{{col}}">
+                        &nbsp; <label for="{{col}}">{{col}}: &nbsp; </label>
+                        <input type="text" size="10" name="{{col}}" id="{{col}}">
                     </div>
                 {% endif %}
                 {% if col == 'status'%}

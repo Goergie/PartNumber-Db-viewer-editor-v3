@@ -1,0 +1,13 @@
+{% extends "layout.html" %}
+
+{% block body %}
+<div class="jumbotron">
+    <h1 class="text-center" style="color:red"><strong>Error!</strong></h1><br>
+    <h3 class="text-center"><strong>This Account is already logged in in another location</strong></h3><br>
+</div>
+<a href="#" onclick="signOut();">
+    <button type="button" class="btn btn-default" aria-label="signout" >
+        <span class="glyphicon glyphicon-log-out" aria-hidden="true"></span>
+        <label for="{{ url_for('logout') }}">Back</label>
+    </button></a>
+{% endblock %}

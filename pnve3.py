@@ -77,6 +77,33 @@ def select_table():
     flash('Table %s selected' % globvar_table_select)
     return redirect(url_for('show_tblxxx_entries'))
 
+#Modifing tables for admins olny
+@app.route('/mod_table')
+def mod_table_page():
+    database_data = {}
+    query_for_tbl_select = "SELECT name FROM sqlite_master WHERE name LIKE 'tbl%'"
+    cursor = g.db.execute(query_for_tbl_select)
+    database_data["tbls"] = map(lambda x: x[0], cursor.fetchall())
+    return render_template('mod_table.html', **database_data)
+
+@app.route('/add_column', methods=['POST'])
+def add_column():
+    print("In add_column")
+    table = request.form['tblselect']
+    print(table)
+    name = request.form['col_name']
+    print(name)
+    col_type = request.form['type']
+    print(col_type)
+    print(request.form['notnull'])
+    if request.form['notnull'] == "Yes":
+        null='not null'
+    else:
+        null = 'null'
+    query_mod_table = "ALTER TABLE %s ADD COLUMN %s %s %s" %(table,name,col_type,null)
+    print(query_mod_table)
+    return redirect(url_for('mod_table_page'))
+
 #Main page after login
 #View of tbl1xx as default
 @app.route('/')
@@ -121,7 +148,6 @@ def del_tblxxx_entry():
 
 #Used to delete multiple rows from the database at once.
 #Checks for checked checkboxes and sends primary key one at a time to database to delete
-#No sql Injection
 @app.route('/del_multiple_tblxxx_entry', methods=['POST'])
 def del_multiple_tblxxx_entry():
     checkedValues = request.form.getlist('multiple_del[]')
@@ -347,7 +373,7 @@ def awaiting_access():
         return render_template('awaiting_access.html')
 
 #Backend for displaying user in database and access levels
-@app.route('/add_user_page')
+@app.route('/user_management')
 def add_user_page():
     if not session.get('logged_in_admin'):
         return redirect(url_for('show_tblxxx_entries'))

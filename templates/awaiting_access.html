@@ -1,5 +1,4 @@
 {% extends "layout.html" %}
-
 {% block body %}
 <div class="jumbotron">
     <h3 class="text-center"><strong>An e-mail has been sent to the admin.</strong></h3><br>
@@ -8,6 +7,6 @@
 <a href="#" onclick="signOut();">
     <button type="button" class="btn btn-default" aria-label="signout" >
         <span class="glyphicon glyphicon-log-out" aria-hidden="true"></span>
-        <label for="{{ url_for('logout') }}">Sign Out</label>
+        <label for="signout">Back</label>
     </button></a>
 {% endblock %}

@@ -1,17 +1,18 @@
-# PartNumber-Db-viewer-editor-v3  
+# PartNumber-Db-viewer-editor-v3
+
 ## Description and Motivation  
 A database management app designed by me to learn python flask
 ## Installation
 ### Pre-requirements
 - Have google api client.  
 [Help](https://developers.google.com/api-client-library/python/start/get_started)
-- Installed python3  
+- Python3  
 (Installed by default on Ubuntu 14.04)
-- Installed sqlite3  
+- Sqlite3  
 [Help](http://www.tutorialspoint.com/sqlite/sqlite_installation.htm)
-- Downloaded jquery Idle  
+- jquery Idle  
 [GitHub link](https://github.com/kidh0/jquery.idle)
-- download flask  
+- Flask  
 `pip install Flask`
 
 #### After Pre-requirements are met do the following steps:

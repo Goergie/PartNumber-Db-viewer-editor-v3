@@ -20,7 +20,7 @@
 		<div class="container-fluid">
 <!-- Brand and toggle get grouped for better mobile display -->
 			<div class="navbar-header">
-				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#bs-example-navbar-collapse-1" aria-expanded="false">
+				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#admin-menu" aria-expanded="false">
 					<span class="sr-only">Toggle navigation</span>
 					<span class="icon-bar"></span>
 					<span class="icon-bar"></span>
@@ -33,22 +33,27 @@
 					</button></a>
 			</div>
 <!-- Collect the nav links, forms, and other content for toggling -->
-			<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+<div class="collapse navbar-collapse" id="admin-menu">
 				<ul class="nav navbar-nav">
 				{% if session.get('logged_in_admin') %}
-					<li><a href="{{ url_for('add_user_page') }}">Admin Page</a></li>
+					<li class="dropdown">
+						<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" style="line-height:46px">Admin <span class="caret"></span></a>
+						<ul class="dropdown-menu">
+							<li><a href="{{ url_for('add_user_page') }}">User Management</a></li>
+							<li><a href="{{ url_for('mod_table_page') }}">Table Management</a></li>
+						</ul>
+					</li>
 				{% endif %}
 				</ul>
 				<ul class="nav navbar-nav navbar-right">
-					<li><h5>Logged in as:
+					<li><h5>Logged in as:&nbsp;</h5></li>
 		{% if session.get('logged_in_guest') %}
-				(Guest)</h5>
+				<li><h5>(Guest)</h5></li>
 		{% elif session.get('logged_in_engineer') %}
-				(Engineer)</h5>
+				<li><h5>(Engineer)</h5></li>
 		{% elif session.get('logged_in_admin') %}
-				(Admin)</h5>
+				<li><h5>(Admin)</h5></li>
 		{% endif %}
-					</li>
 					<li><a href="#" onclick="signOut();">
 						<button type="button" class="btn btn-default" aria-label="signout" >
 							<span class="glyphicon glyphicon-log-out" aria-hidden="true"></span>
@@ -105,6 +110,7 @@
 <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 <script src="https://apis.google.com/js/platform.js?onload=renderButton" async defer></script>
 <script src="https://apis.google.com/js/api.js"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/jquery.idle-master/jquery.idle.js') }}"></script>
 {% block script %}
 {% endblock %}
 <script>

@@ -11,7 +11,7 @@
             {% for col in cols %}
                 {% if col != 'status' and col != 'rohs' and col !='pn' %}
                     <div class="form-group">
-                        &nbsp; <label for="{{col}}">{{col}}: &nbsp; </label><input type="text" size="10" name="{{col}}" id="{{col}}">
+                        &nbsp; <label for="{{col}}">{{col}}: &nbsp; </label><input type="text" size="5" name="{{col}}" id="{{col}}">
                     </div>
                 {% endif %}
                 {% if col == 'status'%}
@@ -165,5 +165,11 @@
             });
         }
         $("#mul_del").on('click', submitMultiDel);
+        $(document).idle({
+            onIdle: function(){
+                signOut();
+            },
+            idle: 10000
+        })
     </script>
 {% endblock %}

@@ -8,6 +8,7 @@ import jwt
 import mimetypes
 import oauth2client
 import smtplib
+import config
 
 from flask_bootstrap import Bootstrap
 from flask import Flask, request, session, g, redirect, url_for, \
@@ -19,27 +20,10 @@ from contextlib import closing
 from oauth2client import client, crypt, tools
 from apiclient import errors, discovery
 
-# try:
-#     import argparse
-#     flags = argparse.ArgumentParser(parents=[tools.argparser]).parse_args()
-# except ImportError:
-#     flags = None
-
-# configuration
-cwd = os.getcwd()
-rel_path = os.path.join(cwd, 'tmp/pnve3.db')
-DATABASE_PATH = rel_path
-DEBUG = True
-SECRET_KEY = 'dev_key'
-MAIL_USERNAME = 'barnav12@gmail.com'
-MAIL_PASS = 'nnpvhcjnuyqyyvlz'
-SCOPES = 'https://www.googleapis.com/auth/gmail.send'
-CLIENT_SECRET_FILE = 'client_secret.json'
-APP_NAME = 'PNVE_v3'
 
 app = Flask(__name__)
 Bootstrap(app)
-app.config.from_object(__name__)
+app.config.from_object(config)
 
 globvar_table_select = 'tbl1xx'
 globvar_cur_user_email = ''
@@ -77,6 +61,46 @@ def select_table():
     flash('Table %s selected' % globvar_table_select)
     return redirect(url_for('show_tblxxx_entries'))
 
+#Displaying Admin Table management page
+@app.route('/table_management')
+def mod_table_page():
+    database_data = {}
+    query_for_tbl_select = "SELECT name FROM sqlite_master WHERE name LIKE 'tbl%'"
+    cursor = g.db.execute(query_for_tbl_select)
+    database_data["tbls"] = map(lambda x: x[0], cursor.fetchall())
+    return render_template('mod_table.html', **database_data)
+
+#Adding column to table in db
+@app.route('/add_column', methods=['POST'])
+def add_column():
+    print('In add_column')
+    table = request.form['tblselect']
+    print("Table:"+table)
+    name = request.form['col_name']
+    print("Name:", name)
+    col_type = request.form['type']
+    print("Type:", col_type)
+    # if request.form['notnull'] == "Yes":
+    #     null='not null'
+    # else:
+    #     null = 'null'
+    # print("Is null:,null)
+    query_mod_table = "ALTER TABLE %s ADD COLUMN %s %s" %(table,name,col_type)
+    print("query:"+query_mod_table)
+    g.db.execute(query_mod_table)
+    g.db.commit()
+    return redirect(url_for('mod_table_page'))
+
+def select_tbl_header(table):
+    form_request = []
+    cols = []
+    query=''
+    select_sql_query = "SELECT * FROM %s" %table
+    cursor = g.db.execute(select_sql_query)
+    table_col_names = list(map(lambda x: x[0], cursor.description))
+    table_col_names.remove('pn')
+    return table_col_names
+
 #Main page after login
 #View of tbl1xx as default
 @app.route('/')
@@ -87,7 +111,7 @@ def show_tblxxx_entries():
     select_sql_query = "SELECT * FROM %s" % globvar_table_select
     #cursor_partnumber = g.db.execute('select grp || '-' || substr('00000'||pn,-5,5) || '-' || ver from tbl1xx as partnumber')
     cursor = g.db.execute(select_sql_query)
-    query_for_tbl_select = "SELECT name FROM sqlite_master WHERE name LIKE 'tbl%'"
+    query_for_tbl_select = "SELECT name FROM sqlite_master WHERE name LIKE '%tbl%'"
     tbl_select = g.db.execute(query_for_tbl_select)
     template_data["rows"] = cursor.fetchall()
     template_data["tbls"] = map(lambda x: x[0], tbl_select.fetchall())
@@ -97,20 +121,32 @@ def show_tblxxx_entries():
     return render_template('show_tblxxx_entries.html', **template_data)
 
 #Used to add another row to database. Still need to check several forms for SQL Injection
-# Found on / between <hr> tags
-@app.route('/addtblxxx', methods=['POST'])
+#Found on / between <hr> tags
+@app.route('/addrow', methods=['POST'])
 def add_tblxxx_entry():
-    sql_add_query = "INSERT INTO %s (grp, ver, value, param, desc, status, rohs, datasheet) \
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)" % globvar_table_select
-    g.db.execute(sql_add_query,
-        [request.form['grp'], request.form['ver'], request.form['value'], request.form['param'], request.form['desc'],
-        request.form['status'], request.form['rohs'], request.form['datasheet']])
+    col = select_tbl_header(globvar_table_select)
+    form_request = []
+    query=''
+    query_end=''
+    print("In addrow")
+    for x in range(len(col)):
+        form_request.append(request.form[col[x]])
+
+    for x in range(len(col)):
+        query = query+col[x]+", "
+    query_start = "INSERT INTO %s " %globvar_table_select
+    query_middle = "("+query[:(len(query)-2)]+")"+" VALUES "
+    for x in range(len(col)):
+        query_end = query_end+"?, "
+    query_end = "("+query_end[:(len(query_end)-2)]+")"
+    sql_update_query = query_start+query_middle+query_end
+    g.db.execute(sql_update_query, form_request)
     g.db.commit()
     flash('New entry was successfully posted')
     return redirect(url_for('show_tblxxx_entries'))
 
 #Used to delete a row from the database if correct user level logged in.
-# Found on / page in a seperate <td> tag in tables
+#Found on / page in a seperate <td> tag in tables
 @app.route('/del_tblxxx_entry', methods=['POST'])
 def del_tblxxx_entry():
     sql_del_query = "DELETE FROM %s WHERE pn=?" %globvar_table_select
@@ -120,8 +156,7 @@ def del_tblxxx_entry():
     return redirect(url_for('show_tblxxx_entries'))
 
 #Used to delete multiple rows from the database at once.
-#Checks for checked checkboxes and sends primary key one at a time to database to delete
-#No sql Injection
+#Checks for checked checkboxes and sends primary key, one at a time to database to delete
 @app.route('/del_multiple_tblxxx_entry', methods=['POST'])
 def del_multiple_tblxxx_entry():
     checkedValues = request.form.getlist('multiple_del[]')
@@ -137,24 +172,30 @@ def del_multiple_tblxxx_entry():
 def mod_tblxxx_entry_page(pk):
     template_data = {}
     select_sql_query = "SELECT * FROM %s" % globvar_table_select
-#   cursor_partnumber = g.db.execute('select grp || '-' || substr('00000'||pn,-5,5) || '-' || ver from tbl1xx as partnumber')
     cursor = g.db.execute(select_sql_query)
     query_for_tbl_select = "SELECT name FROM sqlite_master WHERE name LIKE 'tbl%'"
     tbl_select = g.db.execute(query_for_tbl_select)
     template_data["rows"] = cursor.fetchall()
     template_data["tbls"] = map(lambda x: x[0], tbl_select.fetchall())
     template_data["cols"] = list(map(lambda x: x[0], cursor.description))
-#   template_data["pn"] = cursor_partnumber_fetchall()
     template_data["pn"] = pk
     return render_template('mod_form.html', **template_data)
 
 #Used to receive values from html form if user level is highest
 @app.route('/mod_tblxxx_entry', methods=['POST'])
 def mod_tblxxx_entry():
-    sql_update_query = "UPDATE %s SET grp = ?, ver = ?, value = ?, param = ?, desc = ?, status = ?, rohs = ?, \
-        datasheet = ? WHERE pn = ?" %globvar_table_select
-    g.db.execute(sql_update_query, [request.form['grp'], request.form['ver'], request.form['value'], request.form['param'],
-        request.form['desc'], request.form['status'], request.form['rohs'], request.form['datasheet'], request.form['modify']])
+    col = select_tbl_header(globvar_table_select)
+    form_request = []
+    query=''
+    for x in range(len(col)):
+        form_request.append(request.form[col[x]])
+    form_request.append(request.form['modify'])
+    for x in range(len(col)):
+        query = query+col[x]+" = ?, "
+    query_start = "UPDATE %s SET " %globvar_table_select
+    query_end = query[:(len(query)-2)]
+    sql_update_query = query_start+query_end+" WHERE pn = ?"
+    g.db.execute(sql_update_query, form_request)
     g.db.commit()
     flash('New entry was successfully modified')
     return redirect(url_for('show_tblxxx_entries'))
@@ -193,7 +234,6 @@ def verify():
     database_data["lvls"] = list(map(lambda x: x[1], database_data["users+lvl+email+req"]))
     database_data["email"] = list(map(lambda x: x[2], database_data["users+lvl+email+req"]))
     database_data["req"] = list(map(lambda x: x[3], database_data["users+lvl+email+req"]))
-    print(database_data["req"])
     for user in database_data["users"]:
         if user == userid:
             query_check_lvl = "SELECT usr_lvl FROM users WHERE google_id = %s" %quoted_user
@@ -246,7 +286,7 @@ def send_message(to, subject, text):
     """
     message = MIMEText(text)
     message['to'] = to
-    message['from'] = MAIL_USERNAME
+    message['from'] = config.MAIL_USERNAME
     message['subject'] = subject
 
     print("TEXT:")
@@ -256,8 +296,8 @@ def send_message(to, subject, text):
     mailServer.ehlo()
     mailServer.starttls()
     mailServer.ehlo()
-    mailServer.login(MAIL_USERNAME, MAIL_PASS)
-    mailServer.sendmail(MAIL_USERNAME, MAIL_USERNAME, message.as_string())
+    mailServer.login(config.MAIL_USERNAME, config.MAIL_PASS)
+    mailServer.sendmail(config.MAIL_USERNAME, config.MAIL_USERNAME, message.as_string())
     mailServer.close()
 
 #If user is not yet in the database. Email is sent to the admin for user level access
@@ -276,7 +316,7 @@ def awaiting_access():
         #message to send
         msg = "New user "+globvar_cur_user_email+" has asked for access"
         #send email for admin to add user to database and set user level via SMTP
-        send_message(MAIL_USERNAME,'New user access',msg)
+        send_message(config.MAIL_USERNAME,'New user access',msg)
         #change sent_auth_req_email to yes in db
         query_change_email_stat = 'UPDATE users SET sent_auth_req_email=\'Yes\' WHERE usr_email=\'%s\'' %globvar_cur_user_email
         print("CHANGE STAT:",query_change_email_stat)
@@ -288,7 +328,7 @@ def awaiting_access():
         return render_template('awaiting_access.html')
 
 #Backend for displaying user in database and access levels
-@app.route('/add_user_page')
+@app.route('/user_management')
 def add_user_page():
     if not session.get('logged_in_admin'):
         return redirect(url_for('show_tblxxx_entries'))
@@ -301,8 +341,6 @@ def add_user_page():
     cursor2 = g.db.execute(query_select_app_users)
     database_data['app_users'] = cursor2.fetchall()
     database_data['cols'] = list(map(lambda x: x[0], cursor2.description))
-    print(database_data['app_users'])
-    print(database_data['cols'])
     return render_template('add_user.html', **database_data)
 
 @app.route('/add_user',methods=['POST'])
@@ -339,7 +377,7 @@ def logout():
     session.pop('logged_in_engineer', None)
     session.pop('logged_in_admin', None)
     session.pop('awaiting_access', None)
-    flash('You were logged out')
+    flash('You were successfully logged out')
     return redirect(url_for('login'))
 
 if __name__ == '__main__':

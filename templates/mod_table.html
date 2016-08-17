@@ -1,0 +1,57 @@
+{% extends "layout.html" %}
+{% block body %}
+    <h3 class="text-center"><strong>Table Management</strong></h3>
+    <br><br><br>
+    <form action="{{ url_for('add_column') }}" method="post" class="form-inline" role="Add column">
+        <div class="form-group dropdown">
+            <label for="tblselect">Select Table:&nbsp;</label>
+            <select class="form-control text-center" name="tblselect">
+                <option value="" selected>———</option>
+                {% for tbl in tbls %}
+                    <option value="{{tbl}}">{{tbl}}</option>
+                {% endfor %}
+            </select>
+        </div>&nbsp;&nbsp;&nbsp;&nbsp;
+        <div class="form-group dropdown">
+            <label for="col_name">Column Name:&nbsp;</label>
+            <input type="text" size="15" name="col_name" placeholder="Entry name">
+        </div>&nbsp;&nbsp;&nbsp;&nbsp;
+        <div class="form-group dropdown">
+            <label for="type">Type: &nbsp;</label>
+            <select class="form-control text-center" name="type">
+                <option value="" selected>———</option>
+                <option value="INTEGER">INTEGER</option>
+                <option value="TEXT">TEXT</option>
+                <option value="BLOB">BLOB</option>
+                <option value="DOUBLE PRECISION">DOUBLE PRECISION</option>
+                <option value="FLOAT">FLOAT</option>
+                <option value="BOOLEAN">BOOLEAN</option>
+                <option value="DATETIME">DATETIME</option>
+            </select>
+        </div>
+        {# <!-- <div class="form-group">
+            <label for="notnull">&nbsp;&nbsp;Not Null:&nbsp;</label>
+            <input type="checkbox" id="notnull" name="notnull" value="Yes"> &nbsp;&nbsp;
+            <input type="hidden" id="null" name="notnull" value="No">
+        </div> --> #}
+        <div class="form-group pull-right">
+            <input type="submit" class="btn btn-success" value="Add"> &nbsp;&nbsp;
+        </div>
+    </form>
+{% endblock %}
+{% block script %}
+<script>
+{# //idle check function
+#}
+$(document).idle({
+    onIdle: function(){
+        signOut();
+    },
+    idle: 3600000
+})
+ {# // if(document.getElementById("notnull").unchecked){
+ //     document.getElementById("null").disabled = false;
+ // }
+ #}
+</script>
+{% endblock %}

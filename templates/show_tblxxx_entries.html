@@ -112,12 +112,12 @@
                 </td>
                             {% endif %}
                 <td>
-                    <button onclick="deleteOneEntry({{pn}})" data-toggle="tooltip" title="Delete Record" type="submit" class="btn btn-link" aria-label="delete">
+                    <button onclick="deleteOneEntry({{pn}})" type="button" data-toggle="tooltip" title="Delete Record" class="btn btn-link" aria-label="delete">
                         <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
                     </button>
                 </td>
                 <td>
-                    <input class="check" id="mul_check" type="checkbox" name="multiple_del[]" value="{{pn}}">
+                    <input class="check" id="mul_check_{{ pn }}" type="checkbox" name="multiple_del[]" value="{{pn}}">
                 </td>
             </tr>
                         {% endif %} {# if i == (cols_num - 1) #}
@@ -127,12 +127,11 @@
             </form>
         </table>
 	</div>
-{# <!--Add script location--> #}
-{# <!--Script for checking all checkboxs--> #}
 {% endblock %}
 {% block script %}
     <script>
         var checkedValues = [];
+{# /*Script for checking all checkboxs*/#}
         $("#checkAll").click(function() {
             checkedValues = [];
             $(".check").prop('checked', $(this).prop('checked'));
@@ -157,19 +156,11 @@
             $('#multiple_delete').submit();
         }
         function deleteOneEntry(pn) {
-            confirm('Are you sure you want to delete this entry?')
-            $.ajax({
-                    method: "POST",
-                    url: "{{ url_for('del_tblxxx_entry') }}",
-                    data: { delete: pn }
-            });
+            if (confirm('Are you sure you want to delete this entry?') == true) {
+                $("#mul_check_" + pn).prop("checked", true);
+                $("#multiple_delete").submit();
+            }
         }
         $("#mul_del").on('click', submitMultiDel);
-        $(document).idle({
-            onIdle: function(){
-                signOut();
-            },
-            idle: 10000
-        })
     </script>
 {% endblock %}

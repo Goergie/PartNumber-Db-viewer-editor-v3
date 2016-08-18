@@ -122,8 +122,18 @@
 		auth2.signOut().then(function () {
 			console.log('User signed out.');
 			window.location = "{{ url_for('logout') }}";
-			});
+		});
 	}
 </script>
+{% if not (request.path == url_for('login') or request.path == url_for('awaiting_access')) %}
+<script>
+	$(document).idle({
+		onIdle: function(){
+			signOut();
+		},
+		idle: 30000
+	})
+</script>
+{% endif %}
 </body>
 </html>

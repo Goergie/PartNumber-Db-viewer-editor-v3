@@ -64,14 +64,3 @@
         </table>
     </div>
 {% endblock %}
-{% block script %}
-<script>
-//idle check function
-$(document).idle({
-    onIdle: function(){
-        signOut();
-    },
-    idle: 3600000
-})
-</script>
-{% endblock %}

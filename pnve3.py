@@ -24,7 +24,9 @@ from apiclient import errors, discovery
 app = Flask(__name__)
 Bootstrap(app)
 app.config.from_object(config)
+app.jinja_env.add_extension('jinja2.ext.loopcontrols')
 
+#global variables
 globvar_table_select = 'tbl1xx'
 globvar_cur_user_email = ''
 
@@ -47,11 +49,12 @@ def teardown_request_fromdb(exception):
     if db is not None:
         db.close()
 
+#Renders login page. Google acc login login. Login button rendered on front end
 @app.route('/login')
 def login():
     return render_template('login.html')
 
-#Used to select table from database via dropdown form on html side
+#Used to select table from database via dropdown form
 @app.route('/table_select', methods=['POST'])
 def select_table():
     table_data = {}
@@ -73,43 +76,37 @@ def mod_table_page():
 #Adding column to table in db
 @app.route('/add_column', methods=['POST'])
 def add_column():
-    print('In add_column')
     table = request.form['tblselect']
-    print("Table:"+table)
     name = request.form['col_name']
-    print("Name:", name)
     col_type = request.form['type']
-    print("Type:", col_type)
     # if request.form['notnull'] == "Yes":
     #     null='not null'
     # else:
     #     null = 'null'
     # print("Is null:,null)
     query_mod_table = "ALTER TABLE %s ADD COLUMN %s %s" %(table,name,col_type)
-    print("query:"+query_mod_table)
     g.db.execute(query_mod_table)
     g.db.commit()
     return redirect(url_for('mod_table_page'))
 
+#Column name lister
 def select_tbl_header(table):
-    form_request = []
-    cols = []
-    query=''
-    select_sql_query = "SELECT * FROM %s" %table
+    '''Arg: table: table for listing all table header names
+       Returns: List of the headers
+    '''
+    select_sql_query = "SELECT * FROM %s LIMIT 1" %table
     cursor = g.db.execute(select_sql_query)
     table_col_names = list(map(lambda x: x[0], cursor.description))
     table_col_names.remove('pn')
     return table_col_names
 
 #Main page after login
-#View of tbl1xx as default
 @app.route('/')
 def show_tblxxx_entries():
     if (not session.get('logged_in_admin') and not session.get('logged_in_guest') and not session.get('logged_in_engineer')):
           return redirect(url_for('login'))
     template_data = {}
     select_sql_query = "SELECT * FROM %s" % globvar_table_select
-    #cursor_partnumber = g.db.execute('select grp || '-' || substr('00000'||pn,-5,5) || '-' || ver from tbl1xx as partnumber')
     cursor = g.db.execute(select_sql_query)
     query_for_tbl_select = "SELECT name FROM sqlite_master WHERE name LIKE '%tbl%'"
     tbl_select = g.db.execute(query_for_tbl_select)
@@ -117,21 +114,17 @@ def show_tblxxx_entries():
     template_data["tbls"] = map(lambda x: x[0], tbl_select.fetchall())
     template_data["cols"] = list(map(lambda x: x[0], cursor.description))
     template_data["actual_tbl"] = globvar_table_select
-    #template_data["pn"] = cursor_partnumber.fetchall()
     return render_template('show_tblxxx_entries.html', **template_data)
 
-#Used to add another row to database. Still need to check several forms for SQL Injection
-#Found on / between <hr> tags
+#Used to add another row to database.
 @app.route('/addrow', methods=['POST'])
 def add_tblxxx_entry():
     col = select_tbl_header(globvar_table_select)
     form_request = []
     query=''
     query_end=''
-    print("In addrow")
     for x in range(len(col)):
         form_request.append(request.form[col[x]])
-
     for x in range(len(col)):
         query = query+col[x]+", "
     query_start = "INSERT INTO %s " %globvar_table_select
@@ -145,17 +138,6 @@ def add_tblxxx_entry():
     flash('New entry was successfully posted')
     return redirect(url_for('show_tblxxx_entries'))
 
-#Used to delete a row from the database if correct user level logged in.
-#Found on / page in a seperate <td> tag in tables
-@app.route('/del_tblxxx_entry', methods=['POST'])
-def del_tblxxx_entry():
-    sql_del_query = "DELETE FROM %s WHERE pn=?" %globvar_table_select
-    g.db.execute(sql_del_query,[request.form['delete']])
-    g.db.commit()
-    flash('Entry was successfully deleted')
-    return redirect(url_for('show_tblxxx_entries'))
-
-#Used to delete multiple rows from the database at once.
 #Checks for checked checkboxes and sends primary key, one at a time to database to delete
 @app.route('/del_multiple_tblxxx_entry', methods=['POST'])
 def del_multiple_tblxxx_entry():
@@ -164,21 +146,33 @@ def del_multiple_tblxxx_entry():
     for element in checkedValues:
         g.db.execute(sql_multiple_del_query,[element])
         g.db.commit()
-    flash('Entries were successfully deleted')
+    if len(checkedValues) == 1:
+        flash('Entry was successfully deleted')
+    else:
+        flash('Entries were successfully deleted')
     return redirect(url_for('show_tblxxx_entries'))
 
-#Simular code to main page. Redirects user to new page to modify the current values of selected database rows
+#Redirects user to new page to modify the current values of selected database rows
 @app.route('/mod_tblxxx_entry_page/<pk>')
 def mod_tblxxx_entry_page(pk):
     template_data = {}
     select_sql_query = "SELECT * FROM %s" % globvar_table_select
-    cursor = g.db.execute(select_sql_query)
+    select_row_elements = "SELECT * FROM %s WHERE pn = %s" %(globvar_table_select,pk)
+    print(select_row_elements)
     query_for_tbl_select = "SELECT name FROM sqlite_master WHERE name LIKE 'tbl%'"
+    element_select = g.db.execute(select_row_elements)
+    cursor = g.db.execute(select_sql_query)
     tbl_select = g.db.execute(query_for_tbl_select)
+# All records in selected table are saved in this variable
     template_data["rows"] = cursor.fetchall()
+# Tables name are saved in this variable
     template_data["tbls"] = map(lambda x: x[0], tbl_select.fetchall())
+# Column names are saved in this variable
     template_data["cols"] = list(map(lambda x: x[0], cursor.description))
+# primary key saved in this variable from fn arg
     template_data["pn"] = pk
+# row with selected primary key value saved in this variable
+    template_data["modrow"] = element_select.fetchall()
     return render_template('mod_form.html', **template_data)
 
 #Used to receive values from html form if user level is highest
@@ -200,7 +194,7 @@ def mod_tblxxx_entry():
     flash('New entry was successfully modified')
     return redirect(url_for('show_tblxxx_entries'))
 
-#Check if login is valid google acc and if user has access to app
+# Check if login is valid google acc and if user has access to app
 @app.route('/verify', methods=['POST'])
 def verify():
     app_valid_user = "not in db"
@@ -218,21 +212,26 @@ def verify():
     userid = idinfo['sub']
     user_email = idinfo['email']
     check_token = idinfo['email_verified']
-# check if user has valid google email (check google responce)
+# Check if user has valid google email (check google responce)
     if check_token != True:
         flash('Invalid Email!')
         return redirect(url_for('login'))
     global globvar_cur_user_email
     globvar_cur_user_email = user_email
+# adds '' marks to ever side of variables
     quoted_user = "'"+userid+"'"
     quoted_email = "'"+user_email+"'"
 # accepting autherized users
     query_get_userid = "SELECT * FROM users"
     cursor = g.db.execute(query_get_userid)
     database_data["users+lvl+email+req"] = cursor.fetchall()
+# All google_ids saved in this variable
     database_data["users"] = list(map(lambda x: x[0], database_data["users+lvl+email+req"]))
+# All access levels are saved in this variable
     database_data["lvls"] = list(map(lambda x: x[1], database_data["users+lvl+email+req"]))
+# All user email addresses are saved in this variable
     database_data["email"] = list(map(lambda x: x[2], database_data["users+lvl+email+req"]))
+# Saved if user has sent autherization email or not
     database_data["req"] = list(map(lambda x: x[3], database_data["users+lvl+email+req"]))
     for user in database_data["users"]:
         if user == userid:
@@ -248,11 +247,12 @@ def verify():
 # User is already in database but has no permission
                 app_valid_user = "Permission not set"
 # If user not in database (no google_id)
+# userid added to database, but usr_lvl will be added by admin via add_user.html
     if app_valid_user == "not in db":
         query_add_userinfo = "INSERT INTO users (google_id,usr_email,sent_auth_req_email) VALUES (%s,%s,'No')" \
             %(quoted_user,quoted_email)
         g.db.execute(query_add_userinfo)
-        g.db.commit() #userid added to database, but usr_lvl will be added by admin via add_user.html
+        g.db.commit()
 # Check permission level of user
     query_select_user_level = "SELECT usr_lvl FROM users WHERE google_id = %s" %quoted_user
     selected_users_access_lvl = g.db.execute(query_select_user_level)
@@ -271,7 +271,7 @@ def verify():
             session['logged_in_guest'] = True
             flash("You are logged in as a Guest")
             return redirect(url_for('show_tblxxx_entries'))
-# If usr_lvl is null in database
+# If usr_lvl is 'null' in database
     else:
         print( "Request access!")
         session['awaiting_access'] = True
@@ -303,31 +303,34 @@ def send_message(to, subject, text):
 #If user is not yet in the database. Email is sent to the admin for user level access
 @app.route('/awaiting_access')
 def awaiting_access():
-    #check if email has already been sent
+# Check if email has already been sent
     sent_mail = ''
     query_check_mail_sent = 'SELECT sent_auth_req_email FROM users WHERE usr_email = \'%s\'' %globvar_cur_user_email
     cursor = g.db.execute(query_check_mail_sent)
     g.db.commit()
     sent_mail = cursor.fetchall()
     sent_mail = list(map(lambda x: x[0], sent_mail))
-    #Check if email was already sent or not. If yes dont send again
+# Check if email was already sent or not. If yes dont send again
     if sent_mail == ['No']:
-        print("No:In Here")
-        #message to send
+# Debug Message
+        if config.DEBUG == True:
+            print("No:In Here")
+# Message to send
         msg = "New user "+globvar_cur_user_email+" has asked for access"
-        #send email for admin to add user to database and set user level via SMTP
+# Send email for admin to add user to database and set user level via SMTP
         send_message(config.MAIL_USERNAME,'New user access',msg)
-        #change sent_auth_req_email to yes in db
+# Change sent_auth_req_email to yes in db
         query_change_email_stat = 'UPDATE users SET sent_auth_req_email=\'Yes\' WHERE usr_email=\'%s\'' %globvar_cur_user_email
-        print("CHANGE STAT:",query_change_email_stat)
         g.db.execute(query_change_email_stat)
         g.db.commit()
         return render_template('awaiting_access.html')
     else:
-        print("YES: In Here")
+# Debug Message
+        if config.DEBUG == True:
+            print("Yes:In Here")
         return render_template('awaiting_access.html')
 
-#Backend for displaying user in database and access levels
+# Displaying user in database and access levels in a table
 @app.route('/user_management')
 def add_user_page():
     if not session.get('logged_in_admin'):
@@ -352,8 +355,10 @@ def add_user():
     database_data["num_admin"] = cursor.fetchall()
     admin_count = len(database_data["num_admin"])
     listed_user = "['"+request.form['email']+"']"
-    print("Current user: ",globvar_cur_user_email)
-    print("request email:",request.form['email'])
+# Debug Message
+    if config.DEBUG == True:
+        print("Current user: ",globvar_cur_user_email)
+        print("request email:",request.form['email'])
 # Dont allow change if only 1 admin user and change from admin to other
     if admin_count == 1:
         database_data["admin"] = list(map(lambda x: x[0], database_data["num_admin"]))

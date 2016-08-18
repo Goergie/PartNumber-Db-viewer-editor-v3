@@ -4,41 +4,73 @@
 <form action="{{ url_for('mod_tblxxx_entry') }}" method="post" class="form-inline" role="add_row_form">
     <input type="hidden" id="{{pn}}" name="modify" value="{{pn}}">
 {% set cols_num = cols | length %}
+{% set i = 0 %}
 {% for col in cols %}
-  {% if col != 'status' and col != 'rohs' and col !='pn' %}
-    <div class="form-group">
-        <label for="{{col}}">&nbsp; {{col}}: &nbsp;</label><input type="text" size="10" name="{{col}}" id="{{col}}">
-    </div>
-  {% endif %}
-  {% if col == 'status'%}
-    <div class="form-group dropdown">
-        <label for="{{col}}">&nbsp; {{col}}:&nbsp; </label>
-        <select class="form-control text-center" id="{{col}}" name="{{col}}">
-            <option value="active">Active</option>
-            <option value="inactive">Inactive</option>
-            <option value="deleted">Deleted</option>
-            <option value="n/a">n/a</option>
-        </select>
-    </div>
-  {% endif %}
-  {% if col == 'rohs'%}
-    <div class="form-group dropdown">
-      <label for="{{col}}">&nbsp; {{col}}: &nbsp;</label>
-      <select class="form-control text-center" id="{{col}}" name="{{col}}">
-        <option value="yes">Yes</option>
-        <option value="no">No</option>
-        <option value="n/a">n/a</option>
-      </select>
-    </div>
-  {% endif %}
+    {% for row in modrow %}
+        {% if i != 1 %}
+            {% if col != 'status' and col != 'rohs' and col !='pn' %}
+                <div class="form-group">
+                    <label for="{{col}}">&nbsp; {{col}}: &nbsp;</label><input type="text" size="5" name="{{col}}" id="{{col}}" value="{{row[i]}}">
+                </div>
+            {% endif %}
+            {% if col == 'status'%}
+                <div class="form-group dropdown">
+                    <label for="{{col}}">&nbsp; {{col}}:&nbsp; </label>
+                    <select class="form-control text-center" id="{{col}}" name="{{col}}">
+                        {% if row[i] == 'active'%}
+                            <option value="active" selected>Active</option>
+                        {% else %}
+                            <option value="active">Active</option>
+                        {% endif %}
+                        {% if row[i] == 'inactive'%}
+                            <option value="inactive" selected>Inactive</option>
+                        {% else %}
+                            <option value="inactive">Inactive</option>
+                        {% endif %}
+                        {% if row[i] == 'deleted'%}
+                            <option value="deleted" selected>Delete</option>
+                        {% else %}
+                            <option value="delete">Delete</option>
+                        {% endif %}
+                        {% if row[i] == 'active'%}
+                            <option value="n/a" selected>n/a</option>
+                        {% else %}
+                            <option value="n/a">n/a</option>
+                        {% endif %}
+                    </select>
+                </div>
+            {% endif %}
+            {% if col == 'rohs'%}
+                <div class="form-group dropdown">
+                    <label for="{{col}}">&nbsp; {{col}}: &nbsp;</label>
+                    <select class="form-control text-center" id="{{col}}" name="{{col}}">
+                        {% if row[i] == 'yes'%}
+                            <option value="yes" selected>Yes</option>
+                        {% else %}
+                            <option value="yes">Yes</option>
+                        {% endif %}{% if row[i] == 'no'%}
+                            <option value="no" selected>No</option>
+                        {% else %}
+                            <option value="no">No</option>
+                        {% endif %}{% if row[i] == 'n/a'%}
+                            <option value="n/a" selected>n/a</option>
+                        {% else %}
+                            <option value="n/a">n/a</option>
+                        {% endif %}
+                    </select>
+                </div>
+            {% endif %}
+        {% endif %}
+        {% break %}
+    {% endfor %}
+    {% set i = i + 1 %}
 {% endfor %}
     <br><br>
-    <div class="form-group">
-            <input type="hidden" name="colnum" value="{{cols_num}}">
-        <input type="submit" class="btn btn-success" name="pn" value="Modify">
-    </div>
-  </input>
-
+            <div class="form-group">
+                <input type="hidden" name="colnum" value="{{cols_num}}">
+                <input type="submit" class="btn btn-success" name="pn" value="Modify">
+            </div>
+    </input>
 </form>
 <br>
 <a href="{{ url_for('show_tblxxx_entries') }}" data-toggle="tooltip" title="Back">
@@ -46,15 +78,4 @@
         <span class="glyphicon glyphicon-arrow-left" aria-hidden="true"></span> Back
     </button>
 </a>
-{% endblock %}
-{% block script %}
-<script>
-//idle check function
-$(document).idle({
-    onIdle: function(){
-        signOut();
-    },
-    idle: 3600000
-})
-</script>
 {% endblock %}

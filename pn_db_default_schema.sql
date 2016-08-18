@@ -134,23 +134,27 @@ INSERT INTO tbl1xx (grp, value, param, desc, status, rohs, datasheet) VALUES
 (110,'100','1%','1/4','deleted','no','asd');
 INSERT INTO tbl1xx (grp, value, param, desc, status, rohs, datasheet) VALUES
 (111,'1k','.1%','1/5','active','yes','www.hestore.com');
--- For spam fill
--- INSERT INTO tbl1xx (grp, value, param, desc, status, rohs, datasheet) VALUES
--- (101,'100','5%','1/16','active','yes','www.google.com');
--- INSERT INTO tbl1xx (grp, value, param, desc, status, rohs, datasheet) VALUES
--- (101,'100','5%','1/16','active','yes','www.google.com');
--- INSERT INTO tbl1xx (grp, value, param, desc, status, rohs, datasheet) VALUES
--- (101,'100','5%','1/16','active','yes','www.google.com');
--- INSERT INTO tbl1xx (grp, value, param, desc, status, rohs, datasheet) VALUES
--- (101,'100','5%','1/16','active','yes','www.google.com');
--- INSERT INTO tbl1xx (grp, value, param, desc, status, rohs, datasheet) VALUES
--- (101,'100','5%','1/16','active','yes','www.google.com');
--- INSERT INTO tbl1xx (grp, value, param, desc, status, rohs, datasheet) VALUES
--- (101,'100','5%','1/16','active','yes','www.google.com');
--- INSERT INTO tbl1xx (grp, value, param, desc, status, rohs, datasheet) VALUES
--- (101,'100','5%','1/16','active','yes','www.google.com');
--- INSERT INTO tbl1xx (grp, value, param, desc, status, rohs, datasheet) VALUES
--- (101,'100','5%','1/16','active','yes','www.google.com');
+
+-- *************************
+-- *     For spam fill     *
+-- *************************
+
+INSERT INTO tbl1xx (grp, value, param, desc, status, rohs, datasheet) VALUES
+(101,'100','5%','1/16','active','yes','www.google.com');
+INSERT INTO tbl1xx (grp, value, param, desc, status, rohs, datasheet) VALUES
+(101,'100','5%','1/16','active','yes','www.google.com');
+INSERT INTO tbl1xx (grp, value, param, desc, status, rohs, datasheet) VALUES
+(101,'100','5%','1/16','active','yes','www.google.com');
+INSERT INTO tbl1xx (grp, value, param, desc, status, rohs, datasheet) VALUES
+(101,'100','5%','1/16','active','yes','www.google.com');
+INSERT INTO tbl1xx (grp, value, param, desc, status, rohs, datasheet) VALUES
+(101,'100','5%','1/16','active','yes','www.google.com');
+INSERT INTO tbl1xx (grp, value, param, desc, status, rohs, datasheet) VALUES
+(101,'100','5%','1/16','active','yes','www.google.com');
+INSERT INTO tbl1xx (grp, value, param, desc, status, rohs, datasheet) VALUES
+(101,'100','5%','1/16','active','yes','www.google.com');
+INSERT INTO tbl1xx (grp, value, param, desc, status, rohs, datasheet) VALUES
+(101,'100','5%','1/16','active','yes','www.google.com');
 
 -- *************************
 -- *       Demo Data       *
@@ -189,3 +193,10 @@ INSERT INTO tbl4xx (grp, value, param, desc, status, rohs, datasheet) VALUES
 (402,'1k','55%','1/6','inactive','no','asd');
 INSERT INTO tbl4xx (grp, value, param, desc, status, rohs, datasheet) VALUES
 (403,'10k','1%','1/6','n/a','n/a','www.ddr.com');
+
+-- *************************
+-- *       Add Admin       *
+-- *************************
+
+INSERT INTO users (google_id,usr_lvl,usr_email,sent_auth_req_email) VALUES
+('110738595623819373018',2,'barnav12@gmail.com','Yes');

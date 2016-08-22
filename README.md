@@ -4,6 +4,8 @@
 A database management app designed by me to learn python flask
 ## Installation
 ### Pre-requirements
+- python3-pip  
+`sudo apt-get install python3-pip`
 - Have google api client.  
 [Help](https://developers.google.com/api-client-library/python/start/get_started)
 - Python3  
@@ -14,18 +16,17 @@ A database management app designed by me to learn python flask
 [GitHub link](https://github.com/kidh0/jquery.idle)
 - Flask  
 `pip install Flask`
+- Bootstrap-flask  
+`pip install flask-bootstrap`
 
 #### After Pre-requirements are met do the following steps:
 (*Steps for Ubuntu*)  
 1. When all pre installation requirements are met. Clone or download the app from GitHub to your prefered location.  
-<!--Maybe not needed. Need to test-->
-2. Open sqlite3 in a terminal and run:  
-`.read /path/to/pn_db_default_schema` then  
-`.open /path/to/app/tmp/pnve3.db`  
+2. Open a terminal and run: `cd /path/to/app` then `mkdir ./tmp` then `sqlite3 ./tmp/pnve3.db` < pn_db_default_schema.sql
 3. Open a new terminal and type:  
 `cd /path/to/app` then `python3 pnve3.py`
 
 ## Tests
 Under construction
 ## Licences
-**See Licences for pre-installtion requirements**  
+**See Licences for pre-installation requirements**  

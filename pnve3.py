@@ -67,6 +67,9 @@ def select_table():
 #Displaying Admin Table management page
 @app.route('/table_management')
 def mod_table_page():
+    if not session.get('logged_in_admin'):
+#TO-DO: add html error page access denied!
+        return redirect(url_for('show_tblxxx_entries'))
     database_data = {}
     query_for_tbl_select = "SELECT name FROM sqlite_master WHERE name LIKE 'tbl%'"
     cursor = g.db.execute(query_for_tbl_select)
@@ -76,9 +79,21 @@ def mod_table_page():
 #Adding column to table in db
 @app.route('/add_column', methods=['POST'])
 def add_column():
+    if not session.get('logged_in_admin'):
+#TO-DO: add html error page access denied!
+        return redirect(url_for('show_tblxxx_entries'))
     table = request.form['tblselect']
+    if table == '':
+        flash('Please select table')
+        return(redirect(url_for('mod_table_page')))
     name = request.form['col_name']
+    if name == '':
+        flash('Please enter column name')
+        return(redirect(url_for('mod_table_page')))
     col_type = request.form['type']
+    if col_type == '':
+        flash('Please select column type')
+        return(redirect(url_for('mod_table_page')))
     # if request.form['notnull'] == "Yes":
     #     null='not null'
     # else:
@@ -87,6 +102,7 @@ def add_column():
     query_mod_table = "ALTER TABLE %s ADD COLUMN %s %s" %(table,name,col_type)
     g.db.execute(query_mod_table)
     g.db.commit()
+    flash('Table updated')
     return redirect(url_for('mod_table_page'))
 
 #Column name lister
@@ -155,6 +171,9 @@ def del_multiple_tblxxx_entry():
 #Redirects user to new page to modify the current values of selected database rows
 @app.route('/mod_tblxxx_entry_page/<pk>')
 def mod_tblxxx_entry_page(pk):
+    if not session.get('logged_in_admin'):
+#TO-DO: add html error page access denied!
+        return redirect(url_for('show_tblxxx_entries'))
     template_data = {}
     select_sql_query = "SELECT * FROM %s" % globvar_table_select
     select_row_elements = "SELECT * FROM %s WHERE pn = %s" %(globvar_table_select,pk)
@@ -303,6 +322,8 @@ def send_message(to, subject, text):
 #If user is not yet in the database. Email is sent to the admin for user level access
 @app.route('/awaiting_access')
 def awaiting_access():
+    if not session.get('awaiting_access'):
+        return redirect(url_for('show_tblxxx_entries'))
 # Check if email has already been sent
     sent_mail = ''
     query_check_mail_sent = 'SELECT sent_auth_req_email FROM users WHERE usr_email = \'%s\'' %globvar_cur_user_email
@@ -355,6 +376,12 @@ def add_user():
     database_data["num_admin"] = cursor.fetchall()
     admin_count = len(database_data["num_admin"])
     listed_user = "['"+request.form['email']+"']"
+    if request.form['email'] == '':
+        flash('Please select a user')
+        return redirect(url_for('add_user_page'))
+    if request.form['adduser'] == '':
+        flash('Please select a permission level')
+        return redirect(url_for('add_user_page'))
 # Debug Message
     if config.DEBUG == True:
         print("Current user: ",globvar_cur_user_email)

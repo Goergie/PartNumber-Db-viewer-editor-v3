@@ -22,7 +22,7 @@ A database management app designed by me to learn python flask
 #### After Pre-requirements are met do the following steps:
 (*Steps for Ubuntu*)  
 1. When all pre installation requirements are met. Clone or download the app from GitHub to your prefered location.  
-2. Open a terminal and run: `cd /path/to/app` then `mkdir ./tmp` then `sqlite3 ./tmp/pnve3.db` < pn_db_default_schema.sql
+2. Open a terminal and run: `cd /path/to/app` then `mkdir ./tmp` then `sqlite3 ./tmp/pnve3.db < pn_db_default_schema.sql`
 3. Open a new terminal and type:  
 `cd /path/to/app` then `python3 pnve3.py`
 

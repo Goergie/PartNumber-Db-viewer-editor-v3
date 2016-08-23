@@ -5,28 +5,30 @@ A database management app designed by me to learn python flask
 ## Installation
 ### Pre-requirements
 - python3-pip  
-`sudo apt-get install python3-pip`
 - Have google api client.  
-[Help](https://developers.google.com/api-client-library/python/start/get_started)
 - Python3  
 (Installed by default on Ubuntu 14.04)
 - Sqlite3  
-[Help](http://www.tutorialspoint.com/sqlite/sqlite_installation.htm)
 - jquery Idle  
-[GitHub link](https://github.com/kidh0/jquery.idle)
 - Flask  
-`pip install Flask`
 - Bootstrap-flask  
-`pip install flask-bootstrap`
+All requirements will be downloaded with the install.sh script. Run script to check if your system has all needed programs and python modules. It will download all that are not downloaded, so sudo or superuser permission is needed.  
+**The requirements.sh was tested on Xubuntu 16.04**
 
 #### After Pre-requirements are met do the following steps:
 (*Steps for Ubuntu*)  
-1. When all pre installation requirements are met. Clone or download the app from GitHub to your prefered location.  
-2. Open a terminal and run: `cd /path/to/app` then `mkdir ./tmp` then `sqlite3 ./tmp/pnve3.db < pn_db_default_schema.sql`
-3. Open a new terminal and type:  
-`cd /path/to/app` then `python3 pnve3.py`
+1. Clone or download the repo
+2. Unzip in Downloads (install script will delete later)
+2. Run the requirements.sh script
+1. Run the install.sh script
+2. Open a terminal cd into the folder of app  
+`cd ~/pnve_v3/PartNumber-Db-viewer-editor-v3-google_login_oauth2/`  
+3. Run the python script.  
+`python3 pnve3.py`
 
 ## Tests
-Under construction
+Requirements and install script tested on a VM using a clean Xubuntu 16.04 Image
+Manual tests done for the python app
+Unit Tests are under construction
 ## Licences
 **See Licences for pre-installation requirements**  

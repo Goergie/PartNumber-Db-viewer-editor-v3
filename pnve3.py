@@ -4,7 +4,7 @@ import os
 import json
 import httplib2
 import base64
-import jwt
+#import jwt
 import mimetypes
 import oauth2client
 import smtplib

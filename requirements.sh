@@ -20,6 +20,7 @@ fi
 
 echo Creating app home
 mkdir ~/pnve_v3
+
 cd ~/pnve_v3/venv
 source bin/activate
 cd ..
@@ -46,6 +47,7 @@ fi
 # }
 # checkpip
 
+pip3 install --upgrade pip3
 pip3 install --upgrade Flask
 pip3 install --upgrade flask-bootstrap
 pip3 install --upgrade google-api-python-client

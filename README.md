@@ -17,18 +17,18 @@ All requirements will be downloaded with the install.sh script. Run script to ch
 
 #### After Pre-requirements are met do the following steps:
 (*Steps for Ubuntu*)  
-1. Clone or download the repo
-2. Unzip in Downloads (install script will delete later)
-2. Run the requirements.sh script
-1. Run the install.sh script
-2. Open a terminal cd into the folder of app  
+1. Clone or download the repo  
+2. Unzip in Downloads (install script will delete later)  
+3. Run the requirements.sh script  
+4. Run the install.sh script  
+5. Open a terminal cd into the folder of app  
 `cd ~/pnve_v3/PartNumber-Db-viewer-editor-v3-google_login_oauth2/`  
-3. Run the python script.  
+6. Run the python script.  
 `python3 pnve3.py`
 
 ## Tests
-Requirements and install script tested on a VM using a clean Xubuntu 16.04 Image
-Manual tests done for the python app
+Requirements and install script tested on a VM using a clean Xubuntu 16.04 Image  
+Manual tests done for the python app  
 Unit Tests are under construction
 ## Licences
 **See Licences for pre-installation requirements**  

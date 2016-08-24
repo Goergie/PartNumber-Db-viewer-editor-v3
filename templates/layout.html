@@ -9,104 +9,103 @@
 	<meta name="keywords" contextmenu="Database,viewer,editor,db,orcad">
 	<meta name="google-signin-client_id" content="697582317644-j2hlr3cmofm19cjibkm3ka0o5k9uf5ek.apps.googleusercontent.com">
 	<meta name="author" content="qodbop">
-
-	<!--<link rel="stylesheet" type=text/css href="{{ url_for('static', filename='css/bootstrap.css') }}">-->
+	{#<!--<link rel="stylesheet" type=text/css href="{{ url_for('static', filename='css/bootstrap.css') }}">-->#}
 	<link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.css">
+	<link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Ubuntu">
 	<link rel="stylesheet" type=text/css href="{{ url_for('static', filename='css/own_mod_style.css') }}">
-	<link href="https://fonts.googleapis.com/css?family=Ubuntu" rel="stylesheet">
 </head>
 <body>
-{% if (session.get('logged_in_guest') or session.get('logged_in_admin') or session.get('logged_in_engineer')) %}
-	<nav class="navbar navbar-default">
-		<div class="container-fluid">
-<!-- Brand and toggle get grouped for better mobile display -->
-			<div class="navbar-header">
-				<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#admin-menu" aria-expanded="false">
-					<span class="sr-only">Toggle navigation</span>
-					<span class="icon-bar"></span>
-					<span class="icon-bar"></span>
-					<span class="icon-bar"></span>
-				</button>
-<!--Need to align home symbol in button-->
-				<a class="navbar-brand" href="{{ url_for('show_tblxxx_entries') }}">
-					<button type="button" class="btn btn-link btn-lg" aria-label="home" >
-						<span class="glyphicon glyphicon-home" aria-hidden="true"></span>
-					</button></a>
-			</div>
-<!-- Collect the nav links, forms, and other content for toggling -->
-<div class="collapse navbar-collapse" id="admin-menu">
-				<ul class="nav navbar-nav">
-				{% if session.get('logged_in_admin') %}
-					<li class="dropdown">
-						<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" style="line-height:46px">Admin <span class="caret"></span></a>
-						<ul class="dropdown-menu">
-							<li><a href="{{ url_for('add_user_page') }}">User Management</a></li>
-							<li><a href="{{ url_for('mod_table_page') }}">Table Management</a></li>
-						</ul>
-					</li>
-				{% endif %}
-				</ul>
-				<ul class="nav navbar-nav navbar-right">
-					<li><h5>Logged in as:&nbsp;</h5></li>
-		{% if session.get('logged_in_guest') %}
-				<li><h5>(Guest)</h5></li>
-		{% elif session.get('logged_in_engineer') %}
-				<li><h5>(Engineer)</h5></li>
-		{% elif session.get('logged_in_admin') %}
-				<li><h5>(Admin)</h5></li>
-		{% endif %}
-					<li><a href="#" onclick="signOut();">
-						<button type="button" class="btn btn-default" aria-label="signout" >
-							<span class="glyphicon glyphicon-log-out" aria-hidden="true"></span>
-							<label for="{{ url_for('logout') }}">Sign Out</label>
-						</button></a></li>
-				</ul>
-			</div><!-- /.navbar-collapse -->
-		</div><!-- /.container-fluid -->
-	</nav>
-{% endif %}
-{% if not(session.get('logged_in_guest') and session.get('logged_in_admin') and session.get('logged_in_engineer')) %}
-<br>
-<br>
-{% endif %}
-{% for message in get_flashed_messages() %}
-<!--	<div class="flash bg-info">
-		<span class="text-muted">{{ message }}</span> <a class="close" href="{{ request.path }}" align="right" aria-label="close">&times</a>
-	</div>-->
-	<div class="container">
-		<div class="alert alert-info fade in">
-			{{ message }} <a class="close" href="#" data-dismiss="alert" aria-label="close">&times</a>
-		</div>
-	</div>
-{% endfor %}
-	<div class="page">
-{% block body %}
-{% endblock %}
-	</div>
-{% if request.path == '/' %}
-	<footer class="container-fluid text-center">
-		<div>
-			<a href="{{ request.path }}" data-toggle="tooltip" title="Return to top">
-				<span class="glyphicon glyphicon-chevron-up"></span>
-			</a>
-		</div>
-		<div class="pull-right" style="color: white">
 	{% if (session.get('logged_in_guest') or session.get('logged_in_admin') or session.get('logged_in_engineer')) %}
-			<h5>Logged in as:
+		<nav class="navbar navbar-default">
+			<div class="container-fluid">
+{#<!-- Brand and toggle get grouped for better mobile display -->#}
+				<div class="navbar-header">
+					<button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#admin-menu" aria-expanded="false">
+						<span class="sr-only">Toggle navigation</span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+						<span class="icon-bar"></span>
+					</button>
+{#<!--Need to align home symbol in button-->#}
+					<a class="navbar-brand" href="{{ url_for('show_tblxxx_entries') }}">
+						<button type="button" class="btn btn-link btn-lg" aria-label="home" >
+							<span class="glyphicon glyphicon-home" aria-hidden="true"></span>
+						</button></a>
+				</div>
+{#<!-- Collect the nav links, forms, and other content for toggling -->#}
+				<div class="collapse navbar-collapse" id="admin-menu">
+					<ul class="nav navbar-nav">
+						{% if session.get('logged_in_admin') %}
+							<li class="dropdown">
+								<a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false" style="line-height:46px">Admin <span class="caret"></span></a>
+								<ul class="dropdown-menu">
+									<li><a href="{{ url_for('add_user_page') }}">User Management</a></li>
+									<li><a href="{{ url_for('mod_table_page') }}">Table Management</a></li>
+								</ul>
+							</li>
+						{% endif %}
+					</ul>
+					<ul class="nav navbar-nav navbar-right">
+						<li><h5>Logged in as:&nbsp;</h5></li>
+						{% if session.get('logged_in_guest') %}
+						<li><h5>(Guest)</h5></li>
+						{% elif session.get('logged_in_engineer') %}
+						<li><h5>(Engineer)</h5></li>
+						{% elif session.get('logged_in_admin') %}
+						<li><h5>(Admin)</h5></li>
+						{% endif %}
+						<li><a href="#" onclick="signOut();">
+							<button type="button" class="btn btn-default" aria-label="signout" >
+								<span class="glyphicon glyphicon-log-out" aria-hidden="true"></span>
+								<label for="{{ url_for('logout') }}">Sign Out</label>
+							</button></a></li>
+					</ul>
+				</div>{#<!-- /.navbar-collapse -->#}
+			</div>{#<!-- /.container-fluid -->#}
+		</nav>
 	{% endif %}
-	{% if session.get('logged_in_guest') %}
-			(Guest)</h5>
-	{% elif session.get('logged_in_engineer') %}
-			(Engineer)</h5>
-	{% elif session.get('logged_in_admin') %}
-			(Admin)</h5>
+	{% if not(session.get('logged_in_guest') and session.get('logged_in_admin') and session.get('logged_in_engineer')) %}
+		<br>
+		<br>
 	{% endif %}
+	{% for message in get_flashed_messages() %}
+{#<!--	<div class="flash bg-info">
+		<span class="text-muted">{{ message }}</span> <a class="close" href="{{ request.path }}" align="right" aria-label="close">&times</a>
+	</div>-->#}
+		<div class="container">
+			<div class="alert alert-info fade in">
+				{{ message }} <a class="close" href="#" data-dismiss="alert" aria-label="close">&times</a>
+			</div>
 		</div>
-		<br>
-		<br>
-		<p style="color:white">Made by qodbop</p>
-	</footer>
-{% endif %}
+	{% endfor %}
+		<div class="page">
+			{% block body %}
+			{% endblock %}
+		</div>
+	{% if request.path == '/' %}
+		<footer class="container-fluid text-center">
+			<div>
+				<a href="{{ request.path }}" data-toggle="tooltip" title="Return to top">
+					<span class="glyphicon glyphicon-chevron-up"></span>
+				</a>
+			</div>
+			<div class="pull-right" style="color: white">
+				{% if (session.get('logged_in_guest') or session.get('logged_in_admin') or session.get('logged_in_engineer')) %}
+					<h5>Logged in as:</h5>
+				{% endif %}
+				{% if session.get('logged_in_guest') %}
+					<h5>(Guest)</h5>
+				{% elif session.get('logged_in_engineer') %}
+					<h5>(Engineer)</h5>
+				{% elif session.get('logged_in_admin') %}
+					<h5>(Admin)</h5>
+				{% endif %}
+			</div>
+			<br>
+			<br>
+			<p style="color:white">Made by qodbop</p>
+		</footer>
+	{% endif %}
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.2/jquery.min.js"></script>
 <script src="http://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
 <script src="https://apis.google.com/js/platform.js?onload=renderButton" async defer></script>
@@ -114,6 +113,7 @@
 <script type="text/javascript" src="{{ url_for('static', filename='js/jquery.idle-master/jquery.idle.js') }}"></script>
 {% block script %}
 {% endblock %}
+{% if not request.path == url_for('login') %}
 <script>
 	gapi.load('auth2', function() {
 		gapi.auth2.init();
@@ -126,6 +126,7 @@
 		});
 	}
 </script>
+{% endif %}
 {% if not (request.path == url_for('login') or request.path == url_for('awaiting_access')) %}
 <script>
 	$(document).idle({

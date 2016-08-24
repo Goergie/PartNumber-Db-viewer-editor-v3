@@ -25,6 +25,8 @@ app = Flask(__name__)
 Bootstrap(app)
 app.config.from_object(config)
 app.jinja_env.add_extension('jinja2.ext.loopcontrols')
+app.jinja_env.trim_blocks = True
+app.jinja_env.lstrip_blocks = True
 
 #global variables
 globvar_table_select = 'tbl1xx'

@@ -12,8 +12,6 @@ fi
 
 echo Creating app home
 mkdir ~/pnve_v3
-#jquery.idle folder
-mkdir ~/pnve_v3/$FILEPATH/static/js
 
 echo Checking sqlite3
 if hash sqlite3 2>/dev/null; then
@@ -31,7 +29,7 @@ else
     sudo apt-get install python3
 fi
 
-pip3 install --upgrade pip3
+pip3 install --upgrade pip
 pip3 install --upgrade Flask
 pip3 install --upgrade flask-bootstrap
 pip3 install --upgrade google-api-python-client

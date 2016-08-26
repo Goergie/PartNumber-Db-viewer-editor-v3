@@ -3,6 +3,7 @@
     <h3>Modify row</h3>
     <form action="{{ url_for('mod_tblxxx_entry') }}" method="post" class="form-inline" role="add_row_form">
         <input type="hidden" id="{{pn}}" name="modify" value="{{pn}}">
+        <input type="hidden" name="table" value="{{actual_table}}">
         {% set cols_num = cols | length %}
         {% set i = 0 %}
         {% for col in cols %}

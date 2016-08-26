@@ -18,7 +18,7 @@ A database management app designed by me to learn python flask
 1. Clone or download the repo  
 2. Unzip in Downloads (install script will delete later)  
 3. Run the requirements.sh script  
-`cd ~/Downloads/PartNumber-Db-viewer-editor-v3-google_login_oauth2/` then `./requirements.sh`
+`cd ~/Downloads/PartNumber-Db-viewer-editor-v3-google_login_oauth2/` then `./requirements.sh`  
 4. Run the install.sh script  
 `./install.sh`  
 5. Download [jquery.idle](https://github.com/kidh0/jquery.idle.git)  
@@ -32,7 +32,16 @@ location: ~/pnve_v3/PartNumber-Db-viewer-editor-v3-google_login_oauth2/static/js
 ## Tests
 Requirements and install script tested on a VM using a clean Xubuntu 16.04 Image, with partical requirements met and all requirements met.  
 Manual tests done for the python app  
-Unit Tests are under construction
+Unit Tests are under construction  
 Front end tests done on Mozilla Firefox 47.0 and Google Chrome Version 52.0.2743.116 (64-bit)
+
+##TO-DO:
+- Remove all global variables  
+- Improve session security  
+- Add order by on columns  
+- Keep table view on current table after modifications/deletions (Reverts back to tbl1xx view atm)  
+- Search option  
+- Make partnumber equal grp+pn+ver  
+
 ## Licences
 **See Licences for pre-installation requirements**  

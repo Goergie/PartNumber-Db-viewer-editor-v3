@@ -36,6 +36,10 @@
                     </div>
                 {% endif %}
             {% endfor %}
+            <div>
+                {% set table = actual_tbl %}
+                <input type="hidden" name="table" value="{{table}}">
+            </div>
             <div class="form-group pull-right">
                 <input type="submit" class="btn btn-success" value="Add"> &nbsp;&nbsp;
             </div>
@@ -45,10 +49,10 @@
     <br>
 
 {# <!--Table Dropdown--> #}
-    <form action="{{ url_for('select_table') }}" method="POST" class="form-inline" role="select_table_form">
+    <form action="{{ url_for('show_tblxxx_entries') }}" method="GET" class="form-inline" role="select_table_form">
         <div class="form-group dropdown">
             <label for="selectedtable">Select Table:&nbsp;</label>
-            <select class="form-control text-center" id="{{tbl}}" name="tbl_select" onchange="this.form.submit()">Table Select
+            <select class="form-control text-center" id="{{tbl}}" name="table" onchange="this.form.submit()">Table Select
                 {% for tbl in tbls %}
                     {% if tbl == actual_tbl %}
                         <option name="selectedtable" value="{{tbl}}" selected>{{tbl}}</option>
@@ -59,7 +63,7 @@
             </select>
         </div>
     </form>
-    {% if not session.get('logged_in_guest') %}
+    {% if not (session.get('logged_in_guest') or session.get('awaiting_access')) %}
         <div class="pull-right">
             <button class="btn btn-default" type="submit" name="mul_del" id="mul_del">Multiple Delete</button>
         </div>
@@ -95,35 +99,37 @@
     {% endif %}
 {% set cols_num = cols | length %}
             <form action="{{ url_for('del_multiple_tblxxx_entry') }}" id="multiple_delete" method="POST" class="pull-right" role="multiple_delete">
-        {% for row in rows %}
-            <tr>
-                {% for i in range(cols_num) %}
-                <td>{{ row[i] }}</td>
-                    {% if i == 1 %}
-                        {% set pn = row[i] %}
-                    {% endif %}
-                    {% if not session.get('logged_in_guest') %}
-                        {% if i == (cols_num - 1) %}
-                            {% if session.get('logged_in_admin') %}
-                <td><a href="{{ url_for('mod_tblxxx_entry_page',pk=pn) }}" data-toggle="tooltip" title="Edit Record">
-                    <button type="button" class="btn btn-link" aria-label="mod">
-                        <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
-                    </button>
-                </td>
+                {% for row in rows %}
+                    <tr>
+                        {% for i in range(cols_num) %}
+                        <td>{{ row[i] }}</td>
+                            {% if i == 1 %}
+                                {% set pn = row[i] %}
                             {% endif %}
-                <td>
-                    <button onclick="deleteOneEntry({{pn}})" type="button" data-toggle="tooltip" title="Delete Record" class="btn btn-link" aria-label="delete">
-                        <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
-                    </button>
-                </td>
-                <td>
-                    <input class="check" id="mul_check_{{ pn }}" type="checkbox" name="multiple_del[]" value="{{pn}}">
-                </td>
-            </tr>
-                        {% endif %} {# if i == (cols_num - 1) #}
-                    {% endif %} {# if not session.get('logged_in_guest') #}
-                {% endfor %} {# for i in range(cols_num) #}
-        {% endfor %}
+                            {% if not session.get('logged_in_guest') %}
+                                {% if i == (cols_num - 1) %}
+                                    {% if session.get('logged_in_admin') %}
+                                        {% set tbl = actual_tbl %}
+                        <td><a href="{{ url_for('mod_tblxxx_entry_page',table=tbl,pk=pn) }}" data-toggle="tooltip" title="Edit Record">
+                            <button type="button" class="btn btn-link" aria-label="mod">
+                                <span class="glyphicon glyphicon-edit" aria-hidden="true"></span>
+                            </button>
+                        </td>
+                                    {% endif %}
+                        <td>
+                            <button onclick="deleteOneEntry({{pn}})" type="button" data-toggle="tooltip" title="Delete Record" class="btn btn-link" aria-label="delete">
+                                <span class="glyphicon glyphicon-trash" aria-hidden="true"></span>
+                            </button>
+                        </td>
+                        <td>
+                            <input class="check" id="mul_check_{{ pn }}" type="checkbox" name="multiple_del[]" value="{{pn}}">
+                        </td>
+                    </tr>
+                                {% endif %} {# if i == (cols_num - 1) #}
+                            {% endif %} {# if not session.get('logged_in_guest') #}
+                        {% endfor %} {# for i in range(cols_num) #}
+                {% endfor %}
+                <input type="hidden" name="table" value="{{table}}">
             </form>
         </table>
 	</div>
@@ -153,7 +159,9 @@
     });
     function submitMultiDel() {
         console.log(checkedValues);
-        $('#multiple_delete').submit();
+        if (confirm('Are you sure you want to delete these entries?') == true) {
+            $('#multiple_delete').submit();
+        }
     }
     function deleteOneEntry(pn) {
         if (confirm('Are you sure you want to delete this entry?') == true) {

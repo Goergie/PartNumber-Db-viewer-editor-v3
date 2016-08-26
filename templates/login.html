@@ -5,10 +5,9 @@
     <form id="id_token_form" action="{{ url_for('verify') }}" method="POST">
         <input name="id" id="id_token_input" type="text" hidden></input>
     </form>
-    <div class="row">
-    {#<!--<div class="col-md-5"></div>-->#}
-        <div class="col-center" id="my-signin2"></div>
-    </div>
+    <center><div id="my-signin2"></div></center>
+    <br><br>
+    <center><a href="https://accounts.google.com/login">Add Account</a></center>
 {% endblock %}
 {% block script %}
 <script>

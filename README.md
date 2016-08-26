@@ -42,7 +42,15 @@ Front end tests done on Mozilla Firefox 47.0 and Google Chrome Version 52.0.2743
 - Keep table view on current table after modifications/deletions (Reverts back to tbl1xx view atm)  
 - Search option  
 - Make partnumber equal grp+pn+ver  
-- Fix back button interaction on firefox
+- Fix back button interaction on firefox  
+- Make a back to top not staticly fixed to button of the page  
+
+##Release notes
+- Browser back button shows previous page on firefox, but doesn't allow actions. Delete action fixed  
+- Pages don't remember table settings and revert back to default after manipulation (delete, column add, row add/modification)  
+- Nav-bar ugly on mobile version (logged in message not in one line)  
+- Footer is static  
+- Add account doesn't revert to login page after completion  
 
 ## Licences
 **See Licences for pre-installation requirements**  
